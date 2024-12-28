@@ -10,7 +10,7 @@ Features:
 - Search & Discover: Find new friends, groups, and trending topics easily.
   
 Tech Stack:
-- Back-end: Java 17, Spring Boot 5, Spring Security, Hibernate, MySQL
+- Back-end: Java 17, Spring Boot 3.4.1, Spring Security, Hibernate, MySQL
 - Front-end: ReactJS
 - Tools: Maven, Postman, Git, IntelliJ IDEA
 
