@@ -16,6 +16,5 @@ Tech Stack:
 
 License: 
 
-This project is licensed under the MIT License. You are free to use, modify, and distribute this software as long as proper credit is given to the original author.
-
+This project is licensed under the Apache 2.0 License.
 See the LICENSE file for details.
