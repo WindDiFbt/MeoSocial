@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class PostMediaDto {
     private Long id;
     private Long postId;
-    private String mediaType;
+    private Integer mediaType;
     private String mediaUrl;
     private String thumbnailUrl;
     private LocalDateTime createdAt;

@@ -9,10 +9,9 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-
 @Data
-@Entity
 @NoArgsConstructor
+@Entity
 @Table(name = "comments")
 public class Comment {
     @Id

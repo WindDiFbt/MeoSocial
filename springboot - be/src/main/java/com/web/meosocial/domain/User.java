@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -17,21 +18,21 @@ public class User {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "full_name", length = 127)
-    private String fullName;
+    @Column(name = "user_name", length = 45)
+    private String userName;
 
-    @Column(name = "email")
-    private String email;
-
-    @Column(name = "avatar_url")
-    private String avatarUrl;
-
-    @Column(name = "interestedUser", length = 258)
-    private String interestedUser;
+    @Column(name = "password", length = 45)
+    private String password;
 
     @Lob
     @Column(name = "user_status")
-    private String userStatus;
+    private Integer userStatus;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "user")
     private Set<Comment> comments = new LinkedHashSet<>();
@@ -46,25 +47,25 @@ public class User {
     private Set<Post> posts = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "user")
-    private Set<SavedPost> savedposts = new LinkedHashSet<>();
+    private Set<SavedPost> savedPosts = new LinkedHashSet<>();
 
     @OneToOne(mappedBy = "user")
     private UserInfo userinfo;
 
     @OneToMany(mappedBy = "follower")
-    private Set<UserRelationship> userrelationships = new LinkedHashSet<>();
+    private Set<UserRelationship> userRelationships = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "user")
-    private Set<UserRole> userroles = new LinkedHashSet<>();
+    private Set<UserRole> userRoles = new LinkedHashSet<>();
 
     public User(UserDto userDto) {
         if (userDto != null) {
             this.id = userDto.getId();
-            this.fullName = userDto.getFullName();
-            this.email = userDto.getEmail();
-            this.avatarUrl = userDto.getAvatarUrl();
-            this.interestedUser = userDto.getInterestedUser();
+            this.userName = userDto.getUserName();
+            this.password = userDto.getPassword();
             this.userStatus = userDto.getUserStatus();
+            this.createdAt = userDto.getCreatedAt();
+            this.updatedAt = userDto.getUpdatedAt();
         }
     }
 }

@@ -22,7 +22,7 @@ public class CommentMedia {
 
     @Lob
     @Column(name = "media_type")
-    private String mediaType;
+    private Integer mediaType;
 
     @Column(name = "media_url")
     private String mediaUrl;

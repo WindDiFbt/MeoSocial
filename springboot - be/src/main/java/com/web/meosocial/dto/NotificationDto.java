@@ -12,9 +12,9 @@ public class NotificationDto {
     private Long id;
     private Long recipientId;
     private Long senderId;
-    private String type;
+    private Integer type;
     private Long referenceId;
-    private String referenceType;
+    private Integer referenceType;
     private String content;
     private Boolean isRead;
     private LocalDateTime createdAt;

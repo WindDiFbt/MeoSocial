@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class CommentMediaDto {
     private Long id;
     private Long commentId;
-    private String mediaType;
+    private Integer mediaType;
     private String mediaUrl;
     private String thumbnailUrl;
     private LocalDateTime createdAt;
