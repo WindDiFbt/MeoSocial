@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -21,12 +20,24 @@ public class UserInfo {
     @JoinColumn(name = "id", nullable = false)
     private User user;
 
+    @Column(name = "full_name", length = 127)
+    private String fullName;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phone_number", length = 25)
+    private String phoneNumber;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+    @Column(name = "interested_user", length = 258)
+    private String interestedUser;
+
     @Lob
     @Column(name = "gender")
-    private String gender;
-
-    @Column(name = "is_active")
-    private Boolean isActive;
+    private Integer gender;
 
     @Column(name = "study_at", length = 127)
     private String studyAt;
@@ -40,29 +51,21 @@ public class UserInfo {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
     // Constructor to convert UserInfoDto to UserInfo entity
     public UserInfo(UserInfoDto userInfoDto) {
         if (userInfoDto != null) {
             this.id = userInfoDto.getId();
+            this.fullName = userInfoDto.getFullName();
+            this.email = userInfoDto.getEmail();
+            this.phoneNumber = userInfoDto.getPhoneNumber();
+            this.avatarUrl = userInfoDto.getAvatarUrl();
+            this.interestedUser = userInfoDto.getInterestedUser();
             this.gender = userInfoDto.getGender();
-            this.isActive = userInfoDto.getIsActive();
             this.studyAt = userInfoDto.getStudyAt();
             this.workingAt = userInfoDto.getWorkingAt();
             this.favorites = userInfoDto.getFavorites();
             this.dateOfBirth = userInfoDto.getDateOfBirth();
-            this.createdAt = userInfoDto.getCreatedAt();
-            this.updatedAt = userInfoDto.getUpdatedAt();
-            if (userInfoDto.getUserId() != null) {
-                User user = new User();
-                user.setId(userInfoDto.getUserId());
-                this.user = user;
-            }
         }
     }
+
 }

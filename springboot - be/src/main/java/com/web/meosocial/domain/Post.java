@@ -3,11 +3,8 @@ package com.web.meosocial.domain;
 import com.web.meosocial.dto.PostDto;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -28,9 +25,8 @@ public class Post {
     @Column(name = "content", length = 3000)
     private String content;
 
-    @Lob
-    @Column(name = "visibility")
-    private String visibility;
+    @Column(name = "visibility_level")
+    private Integer visibilityLevel;
 
     @Column(name = "is_delete")
     private Boolean isDelete;
@@ -60,13 +56,13 @@ public class Post {
     private Set<PostMedia> postmedia = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "post")
-    private Set<com.web.meosocial.domain.SavedPost> savedposts = new LinkedHashSet<>();
+    private Set<SavedPost> savedposts = new LinkedHashSet<>();
 
     public Post(PostDto postDto) {
         if (postDto != null) {
             this.id = postDto.getId();
             this.content = postDto.getContent();
-            this.visibility = postDto.getVisibility();
+            this.visibilityLevel = postDto.getVisibilityLevel();
             this.isDelete = postDto.getIsDelete();
             this.sharedPostId = postDto.getSharedPostId();
             this.sharedByUserId = postDto.getSharedByUserId();

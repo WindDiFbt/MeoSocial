@@ -12,7 +12,7 @@ public class PostDto {
     private Long id;
     private Long userId;
     private String content;
-    private String visibility;
+    private Integer visibilityLevel;
     private Boolean isDelete;
     private Long sharedPostId;
     private Long sharedByUserId;
@@ -26,7 +26,7 @@ public class PostDto {
             this.id = post.getId();
             this.userId = post.getUser() != null ? post.getUser().getId() : null;
             this.content = post.getContent();
-            this.visibility = post.getVisibility();
+            this.visibilityLevel = post.getVisibilityLevel();
             this.isDelete = post.getIsDelete();
             this.sharedPostId = post.getSharedPostId();
             this.sharedByUserId = post.getSharedByUserId();

@@ -3,7 +3,9 @@ package com.web.meosocial.domain;
 import com.web.meosocial.dto.NotificationDto;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -25,14 +27,14 @@ public class Notification {
 
     @Lob
     @Column(name = "type")
-    private String type;
+    private Integer type;
 
     @Column(name = "reference_id")
     private Long referenceId;
 
     @Lob
     @Column(name = "reference_type")
-    private String referenceType;
+    private Integer referenceType;
 
     @Column(name = "content")
     private String content;
