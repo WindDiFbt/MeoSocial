@@ -4,16 +4,20 @@ import com.web.meosocial.dto.UserDto;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
     @Id
     @Column(name = "id", nullable = false)
     private Long id;
@@ -21,7 +25,7 @@ public class User {
     @Column(name = "user_name", length = 45)
     private String userName;
 
-    @Column(name = "password", length = 45)
+    @Column(name = "password", length = 64)
     private String password;
 
     @Lob
@@ -55,8 +59,12 @@ public class User {
     @OneToMany(mappedBy = "follower")
     private Set<UserRelationship> userRelationships = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "user")
-    private Set<UserRole> userRoles = new LinkedHashSet<>();
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "userroles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new LinkedHashSet<>();
 
     public User(UserDto userDto) {
         if (userDto != null) {
@@ -67,5 +75,39 @@ public class User {
             this.createdAt = userDto.getCreatedAt();
             this.updatedAt = userDto.getUpdatedAt();
         }
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return UserDetails.super.isAccountNonLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return UserDetails.super.isEnabled();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles;
+    }
+
+    @Override
+    public String getUsername() {
+        return "";
     }
 }
