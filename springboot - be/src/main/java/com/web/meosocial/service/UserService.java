@@ -15,6 +15,4 @@ public interface UserService {
     UserDto changePassword(ChangePasswordDto changePasswordDto);
 
     UserDto updateStatus(Long id, UserDto userDto);
-
-//    UserDto loginUser(UserDto userDto);
 }

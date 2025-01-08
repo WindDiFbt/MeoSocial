@@ -15,15 +15,11 @@ import org.springframework.stereotype.Service;
 public class UserRoleServiceImpl implements UserRoleService {
     @Autowired
     private RoleRepository roleRepository;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private UserRoleRepository userRoleRepository;
-
     private final UUID64Generator uuid64Generator = new UUID64Generator();
-
 
     @Override
     public void assignRole(Long userId, String roleType) {

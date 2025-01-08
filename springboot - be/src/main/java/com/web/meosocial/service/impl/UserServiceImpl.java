@@ -7,6 +7,7 @@ import com.web.meosocial.dto.UserDto;
 import com.web.meosocial.repository.UserRepository;
 import com.web.meosocial.service.UserRoleService;
 import com.web.meosocial.service.UserService;
+import com.web.meosocial.service.ValidationService;
 import com.web.meosocial.util.UUID64Generator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,12 +23,11 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private UserRoleService userRoleService;
-
+    @Autowired
+    private ValidationService validationService;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
     private final UUID64Generator uuid64Generator = new UUID64Generator();
 
     @Override
@@ -44,6 +44,7 @@ public class UserServiceImpl implements UserService {
         if (list.isPresent()) {
             throw new IllegalArgumentException("Username already exists");
         }
+        validationService.getUserRegisterError(userDto);
         User user = new User();
         user.setUserName(userDto.getUserName());
         user.setId(uuid64Generator.generateUUID64());
@@ -59,6 +60,7 @@ public class UserServiceImpl implements UserService {
     public UserDto changePassword(ChangePasswordDto changePasswordDto) {
         User user = userRepository.findById(changePasswordDto.getId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
         if (passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword())) {
+            validationService.getUserChangePasswordError(changePasswordDto);
             user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
             userRepository.save(user);
             return new UserDto(user);
