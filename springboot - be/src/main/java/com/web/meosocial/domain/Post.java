@@ -16,7 +16,7 @@ import java.util.Set;
 public class Post {
     @Id
     @Column(name = "id", nullable = false)
-    private Long id;
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -32,7 +32,7 @@ public class Post {
     private Boolean isDelete;
 
     @Column(name = "shared_post_id")
-    private Long sharedPostId;
+    private String sharedPostId;
 
     @Column(name = "shared_by_user_id")
     private Long sharedByUserId;
@@ -45,6 +45,9 @@ public class Post {
 
     @Column(name = "shared_at")
     private LocalDateTime sharedAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @OneToMany(mappedBy = "post")
     private Set<Comment> comments = new LinkedHashSet<>();
@@ -73,6 +76,7 @@ public class Post {
                 this.user = new User();
                 this.user.setId(postDto.getUserId());
             }
+            this.deletedAt = postDto.getDeletedAt();
         }
     }
 }

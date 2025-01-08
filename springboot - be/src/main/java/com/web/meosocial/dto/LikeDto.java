@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class LikeDto {
-    private Long id;
+    private String id;
     private Long userId;
-    private Long postId;
+    private String postId;
     private LocalDateTime createdAt;
 
     // Constructor to map from Like entity to LikeDto

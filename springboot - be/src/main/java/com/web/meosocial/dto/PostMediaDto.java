@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class PostMediaDto {
-    private Long id;
-    private Long postId;
+    private String id;
+    private String postId;
     private Integer mediaType;
     private String mediaUrl;
     private String thumbnailUrl;

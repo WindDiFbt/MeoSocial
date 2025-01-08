@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class CommentDto {
-    private Long id;
+    private String id;
     private Long userId;
-    private Long postId;
+    private String postId;
     private Boolean isDelete;
     private String content;
     private LocalDateTime createdAt;
