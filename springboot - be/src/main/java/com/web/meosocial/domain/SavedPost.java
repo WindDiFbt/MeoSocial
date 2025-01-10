@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class SavedPost {
     @Id
     @Column(name = "id", nullable = false)
-    private Long id;
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

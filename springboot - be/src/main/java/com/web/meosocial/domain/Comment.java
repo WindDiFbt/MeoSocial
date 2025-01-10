@@ -16,7 +16,7 @@ import java.util.Set;
 public class Comment {
     @Id
     @Column(name = "id", nullable = false)
-    private Long id;
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

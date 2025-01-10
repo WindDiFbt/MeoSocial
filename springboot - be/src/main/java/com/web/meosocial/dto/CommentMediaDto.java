@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class CommentMediaDto {
-    private Long id;
-    private Long commentId;
+    private String id;
+    private String commentId;
     private Integer mediaType;
     private String mediaUrl;
     private String thumbnailUrl;

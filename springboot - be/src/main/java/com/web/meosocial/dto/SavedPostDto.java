@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class SavedPostDto {
-    private Long id;
+    private String id;
     private Long userId;
-    private Long postId;
+    private String postId;
     private LocalDateTime savedAt;
 
     // Constructor to map from SavedPost entity to SavedPostDto

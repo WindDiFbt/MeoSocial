@@ -9,16 +9,17 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class PostDto {
-    private Long id;
+    private String id;
     private Long userId;
     private String content;
     private Integer visibilityLevel;
     private Boolean isDelete;
-    private Long sharedPostId;
+    private String sharedPostId;
     private Long sharedByUserId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime sharedAt;
+    private LocalDateTime deletedAt;
 
     // Constructor to map from Post entity to PostDto
     public PostDto(Post post) {
@@ -33,6 +34,7 @@ public class PostDto {
             this.createdAt = post.getCreatedAt();
             this.updatedAt = post.getUpdatedAt();
             this.sharedAt = post.getSharedAt();
+            this.deletedAt = post.getDeletedAt();
         }
     }
 }
