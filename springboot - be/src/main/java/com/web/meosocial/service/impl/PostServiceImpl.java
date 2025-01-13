@@ -4,7 +4,6 @@ import com.web.meosocial.constant.Enums;
 import com.web.meosocial.domain.Post;
 import com.web.meosocial.domain.User;
 import com.web.meosocial.dto.PostDto;
-import com.web.meosocial.repository.PostMediaRepository;
 import com.web.meosocial.repository.PostRepository;
 import com.web.meosocial.repository.UserRepository;
 import com.web.meosocial.service.PostService;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -22,8 +22,6 @@ public class PostServiceImpl implements PostService {
     private PostRepository postRepository;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private PostMediaRepository postMediaRepository;
 
     @Override
     public PostDto createNewPost(PostDto postDto) {
@@ -44,10 +42,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> getAllPostsOfUser(Long userId, boolean isDeleted) {
+    public Set<PostDto> getAllPostsOfUser(Long userId, boolean isDeleted) {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User Not Found: " + userId));
         List<Post> posts = postRepository.findByUserAndIsDelete(user, isDeleted);
-        return posts.stream().map(PostDto::new).collect(Collectors.toList());
+        return posts.stream().map(PostDto::new).collect(Collectors.toSet());
     }
 
     @Override
@@ -64,7 +62,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDto getPost(String postId) {
-        Post post = postRepository.findById(postId).orElse(null);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Post Not Found: " + postId));
         if (post == null) {
             throw new IllegalArgumentException("Post Not Found or deleted: " + postId);
         }

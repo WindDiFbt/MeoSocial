@@ -6,6 +6,7 @@ import com.web.meosocial.dto.UserInfoDto;
 import com.web.meosocial.service.ValidationService;
 import com.web.meosocial.util.ValidationUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,5 +43,23 @@ public class ValidationServiceImpl implements ValidationService {
         if (!errorMessages.isEmpty()) {
             throw new IllegalArgumentException(String.join("\n", errorMessages));
         }
+    }
+
+    @Override
+    public boolean isVideo(MultipartFile file) {
+        String mimeType = file.getContentType();
+        if (mimeType == null) {
+            return false;
+        }
+        return mimeType.startsWith("video/");
+    }
+
+    @Override
+    public boolean isImage(MultipartFile file) {
+        String mimeType = file.getContentType();
+        if (mimeType == null) {
+            return false;
+        }
+        return mimeType.startsWith("image/");
     }
 }

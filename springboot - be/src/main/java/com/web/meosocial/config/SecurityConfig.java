@@ -38,7 +38,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/register").permitAll()
-                        .requestMatchers("/user/**", "/post/**").hasRole("USER"))
+                        .requestMatchers("/user/**", "/post/**").hasRole("USER")
+                        .requestMatchers("/post-media/**").hasRole("USER"))
                 .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
                 .build();

@@ -17,6 +17,7 @@ public class PostMediaDto {
     private LocalDateTime createdAt;
     private Long mediaSize;
     private Integer duration;
+    private Boolean isDeleted;
 
     // Constructor to map from PostMedia entity to PostMediaDto
     public PostMediaDto(PostMedia postMedia) {
@@ -29,6 +30,7 @@ public class PostMediaDto {
             this.createdAt = postMedia.getCreatedAt();
             this.mediaSize = postMedia.getMediaSize();
             this.duration = postMedia.getDuration();
+            this.isDeleted = postMedia.getIsDeleted();
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.web.meosocial.service.impl;
 
+import com.web.meosocial.constant.Enums;
 import com.web.meosocial.domain.UserInfo;
 import com.web.meosocial.dto.UserInfoDto;
 import com.web.meosocial.repository.UserInfoRepository;
@@ -11,9 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Service
 public class UserInfoServiceImpl implements UserInfoService {
@@ -21,7 +19,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     private UserInfoRepository userInfoRepository;
     @Autowired
     private ValidationService validationService;
-    private final String FILE_PATH = "upload/avatars/";
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
     @Override
     public UserInfoDto getUserInfo(Long userId) {
@@ -57,11 +56,11 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     public void updateUserAvatar(Long userId, MultipartFile file) throws IOException {
         UserInfo userInfo = userInfoRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User Not Found"));
-        String fileName = userId + "_" + file.getOriginalFilename();
-        Path filePath = Paths.get(FILE_PATH, fileName);
-        Files.createDirectories(filePath.getParent());
-        Files.write(filePath, file.getBytes());
-        userInfo.setAvatarUrl(filePath.toString());
+        String imageUrl = cloudinaryService.getImageUrlAfterUpload(file, Enums.FolderCloudinary.Avatar.toString());
+        if (imageUrl == null) {
+            throw new RuntimeException("Error while uploading image to Cloudinary: Wrong image format.");
+        }
+        userInfo.setAvatarUrl(imageUrl);
         userInfoRepository.save(userInfo);
     }
 }

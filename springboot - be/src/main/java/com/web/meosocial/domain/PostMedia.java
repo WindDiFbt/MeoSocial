@@ -18,7 +18,7 @@ public class PostMedia {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
-    private com.web.meosocial.domain.Post post;
+    private Post post;
 
     @Lob
     @Column(name = "media_type")
@@ -39,6 +39,9 @@ public class PostMedia {
     @Column(name = "duration")
     private Integer duration;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     public PostMedia(PostMediaDto postMediaDto) {
         if (postMediaDto != null) {
             this.id = postMediaDto.getId();
@@ -52,6 +55,7 @@ public class PostMedia {
                 this.post = new Post();
                 this.post.setId(postMediaDto.getPostId());
             }
+            this.isDeleted = postMediaDto.getIsDeleted();
         }
     }
 }
