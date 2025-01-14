@@ -1,7 +1,7 @@
 package com.web.meosocial.config;
 
-import com.web.meosocial.repository.UserRepository;
-import com.web.meosocial.service.impl.UserInfoDetailsService;
+import com.web.meosocial.repository.user.UserRepository;
+import com.web.meosocial.service.user.impl.UserInfoDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
