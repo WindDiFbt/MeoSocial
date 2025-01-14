@@ -1,6 +1,6 @@
 package com.web.meosocial.rest;
 
-import com.web.meosocial.service.UserService;
+import com.web.meosocial.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

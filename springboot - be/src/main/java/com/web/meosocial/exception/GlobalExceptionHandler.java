@@ -20,4 +20,12 @@ public class GlobalExceptionHandler {
         errorResponse.put("Error Code", HttpStatus.BAD_REQUEST.value());
         return ResponseEntity.badRequest().body(errorResponse);
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<?> handleException(RuntimeException e) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("Messages", e.getMessage().trim().split("\n"));
+        errorResponse.put("Error Code", HttpStatus.BAD_REQUEST.value());
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
 }

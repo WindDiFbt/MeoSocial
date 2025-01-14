@@ -1,7 +1,7 @@
 package com.web.meosocial.config;
 
-import com.web.meosocial.repository.UserRepository;
-import com.web.meosocial.service.impl.UserInfoDetailsService;
+import com.web.meosocial.repository.user.UserRepository;
+import com.web.meosocial.service.user.impl.UserInfoDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,7 +38,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/register").permitAll()
-                        .requestMatchers("/user/**", "/post/**").hasRole("USER"))
+                        .requestMatchers("/user/**", "/post/**").hasRole("USER")
+                        .requestMatchers("/post-media/**").hasRole("USER"))
                 .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
                 .build();

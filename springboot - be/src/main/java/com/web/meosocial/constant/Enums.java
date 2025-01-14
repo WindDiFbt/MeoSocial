@@ -40,4 +40,19 @@ public class Enums {
             this.value = value;
         }
     }
+
+    @Getter
+    public enum MediaType{
+        IMAGE(1),
+        VIDEO(2);
+        private final Integer value;
+
+        private MediaType(Integer value) {
+            this.value = value;
+        }
+    }
+
+    public enum FolderCloudinary{
+        Avatar, PostMedia, CommentMedia
+    }
 }
