@@ -1,7 +1,6 @@
 package com.web.meosocial.domain.notification;
 
-import com.web.meosocial.domain.user.User;
-import com.web.meosocial.dto.notification.NotificationDto;
+import com.web.meosocial.domain.user.model.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
