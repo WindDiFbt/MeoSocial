@@ -28,6 +28,9 @@ public class SavedPost {
     @Column(name = "saved_at")
     private LocalDateTime savedAt;
 
+    @Column(name = "is_delete")
+    private Boolean isDelete;
+
     // Constructor to convert SavedPostDto to SavedPost entity
     public SavedPost(SavedPostDto savedPostDto) {
         if (savedPostDto != null) {

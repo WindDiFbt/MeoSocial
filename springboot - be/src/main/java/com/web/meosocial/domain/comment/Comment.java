@@ -46,6 +46,9 @@ public class Comment {
     @OneToMany(mappedBy = "comment")
     private List<CommentMedia> commentmedia;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     // Constructor to convert CommentDto to Comment entity
     public Comment(CommentDto commentDto) {
         if (commentDto != null) {

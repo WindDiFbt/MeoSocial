@@ -10,6 +10,6 @@ import java.util.List;
 
 @Repository
 public interface PostMediaRepository extends JpaRepository<PostMedia, String> {
-    @Query("SELECT p FROM PostMedia p WHERE p.post.id = :post_id AND p.isDeleted = :isDeleted")
+    @Query("SELECT p FROM PostMedia p WHERE p.post.id = :post_id AND p.isDelete = :isDeleted")
     List<PostMedia> findAllByPostId(@Param("post_id") String post_id, @Param("isDeleted") boolean isDeleted);
 }

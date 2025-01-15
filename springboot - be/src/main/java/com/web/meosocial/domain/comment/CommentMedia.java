@@ -39,6 +39,12 @@ public class CommentMedia {
     @Column(name = "duration")
     private Integer duration;
 
+    @Column(name = "is_delete")
+    private Boolean isDelete;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     public CommentMedia(CommentMediaDto commentMediaDto) {
         if (commentMediaDto != null) {
             this.id = commentMediaDto.getId();

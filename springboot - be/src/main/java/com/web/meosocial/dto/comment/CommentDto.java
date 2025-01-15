@@ -17,6 +17,7 @@ public class CommentDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long parentCommentId;
+    private LocalDateTime deletedAt;
 
     // Constructor to map from Comment entity to CommentDto
     public CommentDto(Comment comment) {
@@ -29,6 +30,7 @@ public class CommentDto {
             this.createdAt = comment.getCreatedAt();
             this.updatedAt = comment.getUpdatedAt();
             this.parentCommentId = comment.getParentCommentId();
+            this.deletedAt = comment.getDeletedAt();
         }
     }
 }

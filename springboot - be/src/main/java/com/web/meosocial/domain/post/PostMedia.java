@@ -39,8 +39,11 @@ public class PostMedia {
     @Column(name = "duration")
     private Integer duration;
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
+    @Column(name = "is_delete")
+    private Boolean isDelete;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     public PostMedia(PostMediaDto postMediaDto) {
         if (postMediaDto != null) {
@@ -55,7 +58,8 @@ public class PostMedia {
 //                this.post = new Post();
 //                this.post.setId(postMediaDto.getPostId());
 //            }
-            this.isDeleted = postMediaDto.getIsDeleted();
+            this.isDelete = postMediaDto.getIsDelete();
+            this.deletedAt = postMediaDto.getDeletedAt();
         }
     }
 }

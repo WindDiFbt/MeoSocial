@@ -22,19 +22,19 @@ public class RestPostController {
         return ResponseEntity.ok().body(postService.createNewPost(postDto));
     }
 
-    @PatchMapping("/delete/{id}")
-    public ResponseEntity<?> deletePost(@PathVariable String id) {
-        postService.deletePost(id);
+    @PatchMapping("/delete/{postId}")
+    public ResponseEntity<?> deletePost(@PathVariable String postId) {
+        postService.deletePost(postId);
         return ResponseEntity.ok().body("Successfully deleted post.");
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getPostById(@PathVariable String id) {
-        return ResponseEntity.ok().body(postService.getPost(id));
+    @GetMapping("/{postId}")
+    public ResponseEntity<?> getPostById(@PathVariable String postId) {
+        return ResponseEntity.ok().body(postService.getPost(postId));
     }
 
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<?> updatePost(@PathVariable String id, @RequestBody PostDto postDto) {
-        return ResponseEntity.ok().body(postService.updatePost(id, postDto));
+    @PatchMapping("/update/{postId}")
+    public ResponseEntity<?> updatePost(@PathVariable String postId, @RequestBody PostDto postDto) {
+        return ResponseEntity.ok().body(postService.updatePost(postId, postDto));
     }
 }

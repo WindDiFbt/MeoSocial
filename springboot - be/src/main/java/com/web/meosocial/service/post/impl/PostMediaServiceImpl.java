@@ -55,7 +55,7 @@ public class PostMediaServiceImpl implements PostMediaService {
                 throw new IllegalArgumentException("Media type unsupported");
             }
             postMedia.setCreatedAt(LocalDateTime.now());
-            postMedia.setIsDeleted(false);
+            postMedia.setIsDelete(false);
             postMediaRepository.save(postMedia);
         } catch (IOException e) {
             throw new IllegalArgumentException("Error uploading media to Cloudinary: " + e.getMessage());
@@ -70,10 +70,10 @@ public class PostMediaServiceImpl implements PostMediaService {
     @Override
     public void deletePostMedia(String postMediaId) {
         PostMedia postMedia = postMediaRepository.findById(postMediaId).orElse(null);
-        if (postMedia == null || postMedia.getIsDeleted()) {
+        if (postMedia == null || postMedia.getIsDelete()) {
             throw new IllegalArgumentException("Post media not found");
         }
-        postMedia.setIsDeleted(true);
+        postMedia.setIsDelete(true);
         postMediaRepository.save(postMedia);
     }
 }

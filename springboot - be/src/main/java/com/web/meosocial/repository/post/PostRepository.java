@@ -10,6 +10,8 @@ import java.util.List;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, String> {
-    @Query("SELECT DISTINCT p FROM Post p JOIN PostMedia pm ON p.id = pm.post.id AND pm.isDeleted = FALSE WHERE p.isDelete = FALSE AND p.user.id = :userId")
+    @Query("SELECT DISTINCT p FROM Post p JOIN PostMedia pm " +
+            "ON p.id = pm.post.id AND pm.isDelete = FALSE " +
+            "WHERE p.isDelete = FALSE AND p.user.id = :userId")
     List<Post> findPostExistWithUserId(@Param("userId") Long userId);
 }

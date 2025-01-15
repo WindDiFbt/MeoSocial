@@ -39,7 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/register").permitAll()
                         .requestMatchers("/user/**", "/post/**").hasRole("USER")
-                        .requestMatchers("/post-media/**").hasRole("USER"))
+                        .requestMatchers("/post-media/**", "/comment/**").hasRole("USER"))
                 .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
                 .build();

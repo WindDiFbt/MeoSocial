@@ -45,43 +45,42 @@ public class PostServiceImpl implements PostService {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User Not Found: " + userId));
         List<Post> posts = postRepository.findPostExistWithUserId(user.getId());
         posts.forEach(post -> {
-            post.setPostmedia(post.getPostmedia().stream().filter(pm -> !pm.getIsDeleted()).collect(Collectors.toList()));
+            post.setPostmedia(post.getPostmedia().stream()
+                    .filter(pm -> !pm.getIsDelete()).collect(Collectors.toList()));
         });
         return posts.stream().map(PostDto::new).collect(Collectors.toList());
     }
 
     @Override
     public void deletePost(String postId) {
-        Post post = postRepository.findById(postId).orElse(null);
-        if (post != null && !post.getIsDelete()) {
-            post.setIsDelete(true);
-            post.setDeletedAt(LocalDateTime.now());
-            postRepository.save(post);
-        } else {
-            throw new IllegalArgumentException("Post Not Found or deleted: " + postId);
-        }
+        Post post = getPostById(postId);
+        post.setIsDelete(true);
+        post.setDeletedAt(LocalDateTime.now());
+        postRepository.save(post);
     }
 
     @Override
     public PostDto getPost(String postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Post Not Found: " + postId));
-        if (post == null) {
-            throw new IllegalArgumentException("Post Not Found or deleted: " + postId);
-        }
-        post.setPostmedia(post.getPostmedia().stream().filter(pm -> !pm.getIsDeleted()).collect(Collectors.toList()));
+        Post post = getPostById(postId);
+        post.setPostmedia(post.getPostmedia().stream()
+                .filter(pm -> !pm.getIsDelete()).collect(Collectors.toList()));
         return new PostDto(post);
     }
 
     @Override
-    public PostDto updatePost(String id, PostDto postDto) {
-        Post post = postRepository.findById(id).orElse(null);
-        if (post != null && !post.getIsDelete()) {
-            post.setContent(postDto.getContent());
-            post.setUpdatedAt(LocalDateTime.now());
-            postRepository.save(post);
-        } else {
-            throw new IllegalArgumentException("Post Not Found or deleted: " + id);
-        }
+    public PostDto updatePost(String postIdd, PostDto postDto) {
+        Post post = getPostById(postIdd);
+        post.setContent(postDto.getContent());
+        post.setUpdatedAt(LocalDateTime.now());
+        postRepository.save(post);
         return new PostDto(post);
+    }
+
+    private Post getPostById(String postId) {
+        Post post = postRepository.findById(postId).orElse(null);
+        if (post == null || post.getIsDelete()) {
+            throw new IllegalArgumentException("Post Not Found or deleted: " + postId);
+        }
+        return post;
     }
 }
