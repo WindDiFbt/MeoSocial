@@ -1,7 +1,6 @@
 package com.web.meosocial.domain.comment.service;
 
 import com.web.meosocial.domain.comment.dto.CommentDto;
-import com.web.meosocial.domain.comment.model.Comment;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
