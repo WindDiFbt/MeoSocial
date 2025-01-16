@@ -6,8 +6,8 @@ import com.web.meosocial.domain.post.dto.PostMediaDto;
 import com.web.meosocial.domain.post.model.Post;
 import com.web.meosocial.domain.post.model.PostMedia;
 import com.web.meosocial.domain.post.repository.PostMediaRepository;
+import com.web.meosocial.domain.post.repository.PostRepository;
 import com.web.meosocial.domain.post.service.PostMediaService;
-import com.web.meosocial.domain.post.service.PostService;
 import com.web.meosocial.domain.validation.service.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class PostMediaServiceImpl implements PostMediaService {
     @Autowired
     private CloudinaryService cloudinaryService;
     @Autowired
-    private PostService postService;
+    private PostRepository postRepository;
 
     @Override
     public List<PostMediaDto> getPostMediaByPostId(String postId) {
@@ -39,7 +39,10 @@ public class PostMediaServiceImpl implements PostMediaService {
     @Override
     public PostMediaDto createPostMedia(String postId, MultipartFile file) {
         PostMedia postMedia = new PostMedia();
-        Post post = postService.getPostById(postId);
+        Post post = postRepository.findById(postId).orElse(null);
+        if (post == null || post.getIsDelete()) {
+            throw new IllegalArgumentException("Post Not Found or deleted: " + postId);
+        }
         try {
             postMedia.setPost(post);
             postMedia.setId(UUID.randomUUID().toString());

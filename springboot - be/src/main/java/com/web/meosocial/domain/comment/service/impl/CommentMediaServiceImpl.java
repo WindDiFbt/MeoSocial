@@ -8,7 +8,6 @@ import com.web.meosocial.domain.comment.model.CommentMedia;
 import com.web.meosocial.domain.comment.repository.CommentMediaRepository;
 import com.web.meosocial.domain.comment.repository.CommentRepository;
 import com.web.meosocial.domain.comment.service.CommentMediaService;
-import com.web.meosocial.domain.comment.service.CommentService;
 import com.web.meosocial.domain.validation.service.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,12 +28,15 @@ public class CommentMediaServiceImpl implements CommentMediaService {
     @Autowired
     private ValidationService validationService;
     @Autowired
-    private CommentService commentService;
+    private CommentRepository commentRepository;
 
     @Override
     public CommentMediaDto createCommentMedia(String commentId, MultipartFile file) {
         CommentMedia commentMedia = new CommentMedia();
-        Comment comment = commentService.getCommentById(commentId);
+        Comment comment = commentRepository.findById(commentId).orElse(null);
+        if (comment == null || comment.getIsDelete()) {
+            throw new IllegalArgumentException("Comment not found or deleted: " + commentId);
+        }
         try {
             commentMedia.setId(UUID.randomUUID().toString());
             commentMedia.setComment(comment);

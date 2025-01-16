@@ -6,7 +6,7 @@ import com.web.meosocial.domain.comment.repository.CommentRepository;
 import com.web.meosocial.domain.comment.service.CommentMediaService;
 import com.web.meosocial.domain.comment.service.CommentService;
 import com.web.meosocial.domain.post.model.Post;
-import com.web.meosocial.domain.post.service.PostService;
+import com.web.meosocial.domain.post.repository.PostRepository;
 import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     private CommentMediaService commentMediaService;
     @Autowired
-    private PostService postService;
+    private PostRepository postRepository;
 
     @Override
     public CommentDto createNewComment(CommentDto commentDto) {
@@ -34,7 +34,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setId(UUID.randomUUID().toString());
         User user = userService.getUserById(commentDto.getUserId());
         comment.setUser(user);
-        Post post = postService.getPostById(commentDto.getPostId());
+        Post post = getPostById(commentDto.getPostId());
         comment.setPost(post);
         comment.setContent(commentDto.getContent());
         comment.setCreatedAt(LocalDateTime.now());
@@ -47,20 +47,20 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentDto> getAllCommentOfUser(Long userId) {
         User user = userService.getUserById(userId);
         List<Comment> comments = commentRepository.findCommentsExistByUserId(user.getId());
-        comments.forEach(comment -> {
-            comment.setCommentmedia(comment.getCommentmedia().stream()
-                    .filter(cm -> !cm.getIsDelete()).collect(Collectors.toList()));
-        });
+        comments.forEach(comment ->
+                comment.setCommentmedia(comment.getCommentmedia().stream()
+                        .filter(cm -> !cm.getIsDelete()).collect(Collectors.toList()))
+        );
         return comments.stream().map(CommentDto::new).collect(Collectors.toList());
     }
 
     @Override
     public List<CommentDto> getCommentOfPost(String postId) {
         List<Comment> comments = commentRepository.findCommentsExistByPostId(postId);
-        comments.forEach(comment -> {
-            comment.setCommentmedia(comment.getCommentmedia().stream()
-                    .filter(cm -> !cm.getIsDelete()).collect(Collectors.toList()));
-        });
+        comments.forEach(comment ->
+                comment.setCommentmedia(comment.getCommentmedia().stream()
+                        .filter(cm -> !cm.getIsDelete()).collect(Collectors.toList()))
+        );
         return comments.stream().map(CommentDto::new).collect(Collectors.toList());
     }
 
@@ -101,12 +101,19 @@ public class CommentServiceImpl implements CommentService {
         return new CommentDto(comment);
     }
 
-    @Override
-    public Comment getCommentById(String commentId) {
+    private Comment getCommentById(String commentId) {
         Comment comment = commentRepository.findById(commentId).orElse(null);
         if (comment == null || comment.getIsDelete()) {
             throw new IllegalArgumentException("Comment not found or deleted: " + commentId);
         }
         return comment;
+    }
+
+    private Post getPostById(String postId) {
+        Post post = postRepository.findById(postId).orElse(null);
+        if (post == null || post.getIsDelete()) {
+            throw new IllegalArgumentException("Post Not Found or deleted: " + postId);
+        }
+        return post;
     }
 }

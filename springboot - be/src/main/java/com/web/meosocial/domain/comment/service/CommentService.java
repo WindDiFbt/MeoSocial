@@ -21,6 +21,4 @@ public interface CommentService {
     CommentDto getComment(String commentId);
 
     CommentDto updateComment(String commentId, CommentDto commentDto);
-
-    Comment getCommentById(String commentId);
 }
