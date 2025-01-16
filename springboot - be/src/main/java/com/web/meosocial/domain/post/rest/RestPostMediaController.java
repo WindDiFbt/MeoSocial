@@ -14,8 +14,7 @@ public class RestPostMediaController {
 
     @PostMapping("/add/{postId}")
     public ResponseEntity<?> addMedia(@PathVariable String postId, @RequestParam("file") MultipartFile file) {
-        postMediaService.createPostMedia(postId, file);
-        return ResponseEntity.ok().body("Added Media to postId: " + postId + " successfully");
+        return ResponseEntity.ok().body( postMediaService.createPostMedia(postId, file));
     }
 
     @GetMapping("/{id}")
