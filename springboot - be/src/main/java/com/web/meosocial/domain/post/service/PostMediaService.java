@@ -8,11 +8,13 @@ import java.util.List;
 
 @Service
 public interface PostMediaService {
-    List<PostMediaDto> getPostMediaByPostId(String id);
+    List<PostMediaDto> getPostMediaByPostId(String postId);
 
-    void createPostMedia(String postId, MultipartFile file);
+    PostMediaDto createPostMedia(String postId, MultipartFile file);
 
     void deletePostMedia(String postMediaId);
+
+    void deletePostMediaOfPost(String postId);
 
     PostMediaDto updatePostMedia(PostMediaDto postMediaDto);
 }

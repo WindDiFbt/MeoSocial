@@ -1,11 +1,13 @@
 package com.web.meosocial.domain.user.service.impl;
 
-import com.web.meosocial.constant.Enums;
-import com.web.meosocial.domain.user.model.UserInfo;
-import com.web.meosocial.domain.user.dto.UserInfoDto;
-import com.web.meosocial.domain.user.repository.UserInfoRepository;
 import com.web.meosocial.cloudinary.CloudinaryService;
+import com.web.meosocial.constant.Enums;
+import com.web.meosocial.domain.user.dto.UserInfoDto;
+import com.web.meosocial.domain.user.model.User;
+import com.web.meosocial.domain.user.model.UserInfo;
+import com.web.meosocial.domain.user.repository.UserInfoRepository;
 import com.web.meosocial.domain.user.service.UserInfoService;
+import com.web.meosocial.domain.user.service.UserService;
 import com.web.meosocial.domain.validation.service.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,10 +24,13 @@ public class UserInfoServiceImpl implements UserInfoService {
     private ValidationService validationService;
     @Autowired
     private CloudinaryService cloudinaryService;
+    @Autowired
+    private UserService userService;
 
     @Override
     public UserInfoDto getUserInfo(Long userId) {
-        return userInfoRepository.findById(userId).stream().map(UserInfoDto::new).findFirst().orElse(null);
+        User user = userService.getUserById(userId);
+        return userInfoRepository.findById(user.getId()).stream().map(UserInfoDto::new).findFirst().orElse(null);
     }
 
     /**
@@ -36,7 +41,8 @@ public class UserInfoServiceImpl implements UserInfoService {
      */
     @Override
     public UserInfoDto updateInformationUser(UserInfoDto userInfoDto) {
-        UserInfo userInfo = userInfoRepository.findById(userInfoDto.getId()).orElseThrow(() -> new IllegalArgumentException("User Not Found"));
+        User user = userService.getUserById(userInfoDto.getId());
+        UserInfo userInfo = userInfoRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("User Not Found"));
         validationService.getUserInfoUpdateError(userInfoDto);
         Field[] fields = userInfoDto.getClass().getDeclaredFields();
         for (Field field : fields) {
@@ -61,7 +67,8 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public void updateUserAvatar(Long userId, MultipartFile file) throws IOException {
-        UserInfo userInfo = userInfoRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User Not Found"));
+        User user = userService.getUserById(userId);
+        UserInfo userInfo = userInfoRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("User Not Found"));
         String imageUrl = cloudinaryService.getImageUrlAfterUpload(file, Enums.FolderCloudinary.Avatar.toString());
         if (imageUrl == null) {
             throw new RuntimeException("Error while uploading image to Cloudinary: Wrong image format.");

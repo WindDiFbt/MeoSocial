@@ -1,9 +1,9 @@
 package com.web.meosocial.domain.user.service.impl;
 
 import com.web.meosocial.constant.Enums;
-import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.dto.ChangePasswordDto;
 import com.web.meosocial.domain.user.dto.UserDto;
+import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.repository.UserRepository;
 import com.web.meosocial.domain.user.service.UserRoleService;
 import com.web.meosocial.domain.user.service.UserService;
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto changePassword(ChangePasswordDto changePasswordDto) {
-        User user = userRepository.findById(changePasswordDto.getId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = getUserById(changePasswordDto.getId());
         if (passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword())) {
             validationService.getUserChangePasswordError(changePasswordDto);
             user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
@@ -74,5 +74,14 @@ public class UserServiceImpl implements UserService {
         user.setUserStatus(userDto.getUserStatus());
         userRepository.save(user);
         return new UserDto(user);
+    }
+
+    @Override
+    public User getUserById(Long id) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null || user.getUserStatus().equals(Enums.UserStatus.NOT_AVAILABLE.getValue())) {
+            throw new IllegalArgumentException("User not found or not available.");
+        }
+        return user;
     }
 }

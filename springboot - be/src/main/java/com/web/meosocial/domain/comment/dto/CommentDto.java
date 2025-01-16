@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -19,6 +21,8 @@ public class CommentDto {
     private Long parentCommentId;
     private LocalDateTime deletedAt;
 
+    private List<CommentMediaDto> media;
+
     // Constructor to map from Comment entity to CommentDto
     public CommentDto(Comment comment) {
         if (comment != null) {
@@ -31,6 +35,9 @@ public class CommentDto {
             this.updatedAt = comment.getUpdatedAt();
             this.parentCommentId = comment.getParentCommentId();
             this.deletedAt = comment.getDeletedAt();
+            if (comment.getCommentmedia() != null) {
+                this.media = comment.getCommentmedia().stream().map(CommentMediaDto::new).collect(Collectors.toList());
+            }
         }
     }
 }

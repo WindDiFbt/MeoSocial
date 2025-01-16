@@ -1,12 +1,12 @@
 package com.web.meosocial.domain.post.service.impl;
 
+import com.web.meosocial.cloudinary.CloudinaryService;
 import com.web.meosocial.constant.Enums;
+import com.web.meosocial.domain.post.dto.PostMediaDto;
 import com.web.meosocial.domain.post.model.Post;
 import com.web.meosocial.domain.post.model.PostMedia;
-import com.web.meosocial.domain.post.dto.PostMediaDto;
 import com.web.meosocial.domain.post.repository.PostMediaRepository;
 import com.web.meosocial.domain.post.repository.PostRepository;
-import com.web.meosocial.cloudinary.CloudinaryService;
 import com.web.meosocial.domain.post.service.PostMediaService;
 import com.web.meosocial.domain.validation.service.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +24,11 @@ public class PostMediaServiceImpl implements PostMediaService {
     @Autowired
     private PostMediaRepository postMediaRepository;
     @Autowired
-    private PostRepository postRepository;
-    @Autowired
     private ValidationService validationService;
     @Autowired
     private CloudinaryService cloudinaryService;
+    @Autowired
+    private PostRepository postRepository;
 
     @Override
     public List<PostMediaDto> getPostMediaByPostId(String postId) {
@@ -37,9 +37,12 @@ public class PostMediaServiceImpl implements PostMediaService {
     }
 
     @Override
-    public void createPostMedia(String postId, MultipartFile file) {
+    public PostMediaDto createPostMedia(String postId, MultipartFile file) {
         PostMedia postMedia = new PostMedia();
-        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Post not found"));
+        Post post = postRepository.findById(postId).orElse(null);
+        if (post == null || post.getIsDelete()) {
+            throw new IllegalArgumentException("Post Not Found or deleted: " + postId);
+        }
         try {
             postMedia.setPost(post);
             postMedia.setId(UUID.randomUUID().toString());
@@ -52,11 +55,12 @@ public class PostMediaServiceImpl implements PostMediaService {
                 postMedia.setMediaUrl(cloudinaryService.getVideoUrlAfterUpload(file, Enums.FolderCloudinary.PostMedia.toString()));
                 postMedia.setMediaSize(file.getSize());
             } else {
-                throw new IllegalArgumentException("Media type unsupported");
+                throw new IllegalArgumentException("Media type not supported");
             }
             postMedia.setCreatedAt(LocalDateTime.now());
             postMedia.setIsDelete(false);
             postMediaRepository.save(postMedia);
+            return new PostMediaDto(postMedia);
         } catch (IOException e) {
             throw new IllegalArgumentException("Error uploading media to Cloudinary: " + e.getMessage());
         }
@@ -75,5 +79,15 @@ public class PostMediaServiceImpl implements PostMediaService {
         }
         postMedia.setIsDelete(true);
         postMediaRepository.save(postMedia);
+    }
+
+    @Override
+    public void deletePostMediaOfPost(String postId) {
+        List<PostMedia> medias = postMediaRepository.findAllByPostId(postId, false);
+        medias.forEach(media -> {
+            media.setIsDelete(true);
+            media.setDeletedAt(LocalDateTime.now());
+        });
+        postMediaRepository.saveAll(medias);
     }
 }
