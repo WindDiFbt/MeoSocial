@@ -1,6 +1,7 @@
 package com.web.meosocial.domain.comment.service;
 
 import com.web.meosocial.domain.comment.dto.CommentDto;
+import com.web.meosocial.domain.comment.model.Comment;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,7 +16,11 @@ public interface CommentService {
 
     void deleteComment(String commentId);
 
+    void deleteCommentOfPost(String postId);
+
     CommentDto getComment(String commentId);
 
     CommentDto updateComment(String commentId, CommentDto commentDto);
+
+    Comment getCommentById(String commentId);
 }

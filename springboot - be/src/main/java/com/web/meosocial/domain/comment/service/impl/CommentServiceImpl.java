@@ -1,13 +1,14 @@
 package com.web.meosocial.domain.comment.service.impl;
 
-import com.web.meosocial.domain.comment.model.Comment;
-import com.web.meosocial.domain.post.model.Post;
-import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.comment.dto.CommentDto;
+import com.web.meosocial.domain.comment.model.Comment;
 import com.web.meosocial.domain.comment.repository.CommentRepository;
-import com.web.meosocial.domain.post.repository.PostRepository;
-import com.web.meosocial.domain.user.repository.UserRepository;
+import com.web.meosocial.domain.comment.service.CommentMediaService;
 import com.web.meosocial.domain.comment.service.CommentService;
+import com.web.meosocial.domain.post.model.Post;
+import com.web.meosocial.domain.post.service.PostService;
+import com.web.meosocial.domain.user.model.User;
+import com.web.meosocial.domain.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,17 +22,19 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     private CommentRepository commentRepository;
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
     @Autowired
-    private PostRepository postRepository;
+    private CommentMediaService commentMediaService;
+    @Autowired
+    private PostService postService;
 
     @Override
     public CommentDto createNewComment(CommentDto commentDto) {
         Comment comment = new Comment();
         comment.setId(UUID.randomUUID().toString());
-        User user = userRepository.findById(commentDto.getUserId()).orElseThrow(() -> new IllegalArgumentException("User Not Found"));
+        User user = userService.getUserById(commentDto.getUserId());
         comment.setUser(user);
-        Post post = postRepository.findById(commentDto.getPostId()).orElseThrow(() -> new IllegalArgumentException("Post Not Found"));
+        Post post = postService.getPostById(commentDto.getPostId());
         comment.setPost(post);
         comment.setContent(commentDto.getContent());
         comment.setCreatedAt(LocalDateTime.now());
@@ -42,8 +45,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentDto> getAllCommentOfUser(Long userId) {
-        userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User Not Found: " + userId));
-        List<Comment> comments = commentRepository.findCommentsExistByUserId(userId);
+        User user = userService.getUserById(userId);
+        List<Comment> comments = commentRepository.findCommentsExistByUserId(user.getId());
         comments.forEach(comment -> {
             comment.setCommentmedia(comment.getCommentmedia().stream()
                     .filter(cm -> !cm.getIsDelete()).collect(Collectors.toList()));
@@ -53,7 +56,6 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentDto> getCommentOfPost(String postId) {
-        postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Post Not Found: " + postId));
         List<Comment> comments = commentRepository.findCommentsExistByPostId(postId);
         comments.forEach(comment -> {
             comment.setCommentmedia(comment.getCommentmedia().stream()
@@ -67,7 +69,19 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = getCommentById(commentId);
         comment.setIsDelete(true);
         comment.setDeletedAt(LocalDateTime.now());
+        commentMediaService.deleteCommentMediaOfComment(commentId);
         commentRepository.save(comment);
+    }
+
+    @Override
+    public void deleteCommentOfPost(String postId) {
+        List<Comment> comments = commentRepository.findCommentsExistByPostId(postId);
+        comments.forEach(comment -> {
+            comment.setIsDelete(true);
+            comment.setDeletedAt(LocalDateTime.now());
+            commentMediaService.deleteCommentMediaOfComment(comment.getId());
+        });
+        commentRepository.saveAll(comments);
     }
 
     @Override
@@ -87,7 +101,8 @@ public class CommentServiceImpl implements CommentService {
         return new CommentDto(comment);
     }
 
-    private Comment getCommentById(String commentId) {
+    @Override
+    public Comment getCommentById(String commentId) {
         Comment comment = commentRepository.findById(commentId).orElse(null);
         if (comment == null || comment.getIsDelete()) {
             throw new IllegalArgumentException("Comment not found or deleted: " + commentId);
