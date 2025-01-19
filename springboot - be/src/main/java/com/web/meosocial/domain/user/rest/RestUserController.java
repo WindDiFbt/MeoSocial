@@ -3,7 +3,9 @@ package com.web.meosocial.domain.user.rest;
 import com.web.meosocial.domain.user.dto.ChangePasswordDto;
 import com.web.meosocial.domain.user.dto.UserDto;
 import com.web.meosocial.domain.user.dto.UserInfoDto;
+import com.web.meosocial.domain.user.dto.UserRelationshipDto;
 import com.web.meosocial.domain.user.service.UserInfoService;
+import com.web.meosocial.domain.user.service.UserRelationshipService;
 import com.web.meosocial.domain.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,8 @@ public class RestUserController {
     private UserService userService;
     @Autowired
     private UserInfoService userInfoService;
+    @Autowired
+    private UserRelationshipService userRelationshipService;
 
     @PostMapping("/register")
     public ResponseEntity<?> addUser(@RequestBody UserDto userDto) {
@@ -63,5 +67,10 @@ public class RestUserController {
         } catch (IOException e) {
             return ResponseEntity.status(500).body("Failed to upload avatar: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/follow")
+    public ResponseEntity<?> followUser(@RequestBody UserRelationshipDto userRelationshipDto) {
+        return ResponseEntity.ok().body(userRelationshipService.followUser(userRelationshipDto));
     }
 }

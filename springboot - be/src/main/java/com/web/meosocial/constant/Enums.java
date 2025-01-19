@@ -42,7 +42,7 @@ public class Enums {
     }
 
     @Getter
-    public enum MediaType{
+    public enum MediaType {
         IMAGE(1),
         VIDEO(2);
         private final Integer value;
@@ -52,7 +52,19 @@ public class Enums {
         }
     }
 
-    public enum FolderCloudinary{
+    public enum FolderCloudinary {
         Avatar, PostMedia, CommentMedia
+    }
+
+    @Getter
+    public enum RelationshipStatus {
+        UNFOLLOW(0),
+        FOLLOW(1),
+        BLOCKED(2);
+        private final Integer value;
+
+        private RelationshipStatus(Integer value) {
+            this.value = value;
+        }
     }
 }
