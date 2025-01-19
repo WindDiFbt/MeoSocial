@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @Entity
@@ -21,6 +23,19 @@ public class UserRelationship {
     @Column(name = "following")
     private Long following;
 
+    @Lob
+    @Column(name = "status")
+    private Integer status;
+
+    @Column(name = "has_mutual_follow")
+    private Boolean hasMutualFollow ;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     // Constructor to convert UserRelationshipDto to UserRelationship entity
     public UserRelationship(UserRelationshipDto userRelationshipDto) {
         if (userRelationshipDto != null) {
@@ -30,7 +45,11 @@ public class UserRelationship {
                 follower.setId(userRelationshipDto.getFollowerId());
                 this.follower = follower;
             }
-            this.following = userRelationshipDto.getFollowing();
+            this.following = userRelationshipDto.getFollowingId();
+            this.status = userRelationshipDto.getStatus();
+            this.hasMutualFollow = userRelationshipDto.getHasMutualFollow();
+            this.createdAt = userRelationshipDto.getCreatedAt();
+            this.updatedAt = userRelationshipDto.getUpdatedAt();
         }
     }
 }
