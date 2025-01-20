@@ -11,6 +11,7 @@ import com.web.meosocial.domain.comment.service.CommentMediaService;
 import com.web.meosocial.domain.validation.service.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -30,6 +31,7 @@ public class CommentMediaServiceImpl implements CommentMediaService {
     @Autowired
     private CommentRepository commentRepository;
 
+    @Transactional
     @Override
     public CommentMediaDto createCommentMedia(String commentId, MultipartFile file) {
         CommentMedia commentMedia = new CommentMedia();
@@ -60,6 +62,7 @@ public class CommentMediaServiceImpl implements CommentMediaService {
         }
     }
 
+    @Transactional
     @Override
     public void deleteCommentMedia(String commentMediaId) {
         CommentMedia commentMedia = commentMediaRepository.findById(commentMediaId).orElse(null);
@@ -70,6 +73,7 @@ public class CommentMediaServiceImpl implements CommentMediaService {
         commentMediaRepository.save(commentMedia);
     }
 
+    @Transactional
     @Override
     public void deleteCommentMediaOfComment(String commentId) {
         List<CommentMedia> medias = commentMediaRepository.findAllByCommentId(commentId);

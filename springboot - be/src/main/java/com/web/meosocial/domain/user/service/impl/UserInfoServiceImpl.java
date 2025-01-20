@@ -11,6 +11,7 @@ import com.web.meosocial.domain.user.service.UserService;
 import com.web.meosocial.domain.validation.service.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -39,6 +40,7 @@ public class UserInfoServiceImpl implements UserInfoService {
      * @param userInfoDto input user information
      * @return UserInfoDto
      */
+    @Transactional
     @Override
     public UserInfoDto updateInformationUser(UserInfoDto userInfoDto) {
         User user = userService.getUserById(userInfoDto.getId());
@@ -65,6 +67,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         return new UserInfoDto(userInfo);
     }
 
+    @Transactional
     @Override
     public void updateUserAvatar(Long userId, MultipartFile file) throws IOException {
         User user = userService.getUserById(userId);

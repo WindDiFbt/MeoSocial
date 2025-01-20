@@ -11,6 +11,7 @@ import com.web.meosocial.domain.post.service.PostMediaService;
 import com.web.meosocial.domain.validation.service.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -36,6 +37,7 @@ public class PostMediaServiceImpl implements PostMediaService {
                 .map(PostMediaDto::new).collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public PostMediaDto createPostMedia(String postId, MultipartFile file) {
         PostMedia postMedia = new PostMedia();
@@ -66,11 +68,13 @@ public class PostMediaServiceImpl implements PostMediaService {
         }
     }
 
+    @Transactional
     @Override
     public PostMediaDto updatePostMedia(PostMediaDto postMediaDto) {
         return null;
     }
 
+    @Transactional
     @Override
     public void deletePostMedia(String postMediaId) {
         PostMedia postMedia = postMediaRepository.findById(postMediaId).orElse(null);
@@ -81,6 +85,7 @@ public class PostMediaServiceImpl implements PostMediaService {
         postMediaRepository.save(postMedia);
     }
 
+    @Transactional
     @Override
     public void deletePostMediaOfPost(String postId) {
         List<PostMedia> medias = postMediaRepository.findAllByPostId(postId, false);

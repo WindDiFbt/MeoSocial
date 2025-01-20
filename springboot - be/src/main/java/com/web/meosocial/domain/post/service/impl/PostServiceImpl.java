@@ -11,6 +11,7 @@ import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +29,7 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private CommentService commentService;
 
+    @Transactional
     @Override
     public PostDto createNewPost(PostDto postDto) {
         Post post = new Post();
@@ -57,6 +59,7 @@ public class PostServiceImpl implements PostService {
         return posts.stream().map(PostDto::new).collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public void deletePost(String postId) {
         Post post = getPostById(postId);
@@ -75,6 +78,7 @@ public class PostServiceImpl implements PostService {
         return new PostDto(post);
     }
 
+    @Transactional
     @Override
     public PostDto updatePost(String postId, PostDto postDto) {
         Post post = getPostById(postId);

@@ -8,8 +8,11 @@ import com.web.meosocial.domain.user.repository.UserRelationshipRepository;
 import com.web.meosocial.domain.user.service.UserRelationshipService;
 import com.web.meosocial.domain.user.service.UserService;
 import com.web.meosocial.util.UUID64Generator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +23,7 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
     @Autowired
     private UserService userService;
     private final UUID64Generator uuid64Generator = new UUID64Generator();
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserRelationshipServiceImpl.class);
 
     /**
      * Creates a new user relationship if it does not already exist.
@@ -28,9 +32,13 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
      * @return the created UserRelationshipDto containing the details of the new relationship
      * @throws IllegalArgumentException if a relationship between the specified follower and following already exists
      */
+    @Transactional
     @Override
     public UserRelationshipDto followUser(UserRelationshipDto userRelationshipDto) {
+        LOGGER.info("Starting followUser process for followerId: {}. followingId; {}",
+                userRelationshipDto.getFollowerId(), userRelationshipDto.getFollowingId());
         if (userRelationshipDto.getFollowerId().equals(userRelationshipDto.getFollowingId())) {
+            LOGGER.error("FollowerId and FollowingId are the same: {}", userRelationshipDto.getFollowerId());
             throw new IllegalArgumentException("Follower and Following cannot be the same user.");
         }
         User follower = userService.getUserById(userRelationshipDto.getFollowerId());
@@ -38,13 +46,18 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
         UserRelationship followerToFollowing = userRelaRepository.getUserRelationship(userRelationshipDto.getFollowerId(), userRelationshipDto.getFollowingId());
         UserRelationship followingToFollower = userRelaRepository.getUserRelationship(userRelationshipDto.getFollowingId(), userRelationshipDto.getFollowerId());
         if (followerToFollowing == null) {
+            LOGGER.info("No existing follower-to-following relationship found. Creating new relationship.");
             return handleNoExistingFollowingToFollower(follower, following, followingToFollower);
         } else if (followerToFollowing.getStatus().equals(Enums.RelationshipStatus.UNFOLLOW.getValue())) {
+            LOGGER.info("Existing follower-to-following relationship found with UNFOLLOW status. Updating relationship.");
             return handleExistingFollowingToFollower(followerToFollowing, followingToFollower);
         }
-        throw new IllegalArgumentException("Action not valid.");
+        LOGGER.warn("No valid action could be performed for followerId: {}, followingId: {}",
+                userRelationshipDto.getFollowerId(), userRelationshipDto.getFollowingId());
+        throw new IllegalArgumentException("User id: " + userRelationshipDto.getFollowerId() + " followed user id: " + userRelationshipDto.getFollowingId());
     }
 
+    @Transactional
     @Override
     public UserRelationshipDto unfollowUser(UserRelationshipDto userRelationshipDto) {
         if (userRelationshipDto.getFollowerId().equals(userRelationshipDto.getFollowingId())) {
@@ -72,8 +85,15 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
         return null;
     }
 
+    @Transactional
     @Override
     public UserRelationshipDto blockUser(UserRelationshipDto userRelationshipDto) {
+        return null;
+    }
+
+    @Transactional
+    @Override
+    public UserRelationshipDto unblockUser(UserRelationshipDto userRelationshipDto) {
         return null;
     }
 
@@ -91,6 +111,8 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
         relationship.setHasMutualFollow(hasMutualFollow);
         relationship.setCreatedAt(LocalDateTime.now());
         userRelaRepository.save(relationship);
+        LOGGER.info("Creating new relationship: followerId - {}, followingId - {}, status - {}, hasMutualFollow - {}",
+                follower.getId(), following.getId(), status, hasMutualFollow);
         return relationship;
     }
 
@@ -98,6 +120,8 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
         userRelationshipExisted.setStatus(status);
         userRelationshipExisted.setHasMutualFollow(hasMutualFollow);
         userRelationshipExisted.setUpdatedAt(LocalDateTime.now());
+        LOGGER.info("Updating relationship: relationshipId - {}, status - {}, hasMutualFollow - {}",
+                userRelationshipExisted.getId(), status, hasMutualFollow);
         userRelaRepository.save(userRelationshipExisted);
     }
 
