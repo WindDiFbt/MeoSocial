@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,6 +36,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll().stream().map(UserDto::new).collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public UserDto addUser(UserDto userDto) {
         if (userDto.getUserName() == null || userDto.getPassword() == null) {
@@ -56,6 +58,7 @@ public class UserServiceImpl implements UserService {
         return new UserDto(user);
     }
 
+    @Transactional
     @Override
     public UserDto changePassword(ChangePasswordDto changePasswordDto) {
         User user = getUserById(changePasswordDto.getId());
@@ -68,6 +71,7 @@ public class UserServiceImpl implements UserService {
         throw new IllegalArgumentException("Wrong old password");
     }
 
+    @Transactional
     @Override
     public UserDto updateStatus(Long id, UserDto userDto) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));

@@ -11,6 +11,8 @@ public interface UserRelationshipService {
 
     UserRelationshipDto blockUser(UserRelationshipDto userRelationshipDto);
 
+    UserRelationshipDto unblockUser(UserRelationshipDto userRelationshipDto);
+
     UserRelationshipDto getUserRelationshipById(Long id);
 
 }
