@@ -66,5 +66,14 @@ public class Enums {
         private RelationshipStatus(Integer value) {
             this.value = value;
         }
+
+        public static RelationshipStatus fromValue(int value) {
+            for (RelationshipStatus status : RelationshipStatus.values()) {
+                if (status.getValue() == value) {
+                    return status;
+                }
+            }
+            throw new IllegalArgumentException("Unexpected value: " + value);
+        }
     }
 }

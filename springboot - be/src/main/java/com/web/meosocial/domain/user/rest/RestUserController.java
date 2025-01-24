@@ -73,4 +73,19 @@ public class RestUserController {
     public ResponseEntity<?> followUser(@RequestBody UserRelationshipDto userRelationshipDto) {
         return ResponseEntity.ok().body(userRelationshipService.followUser(userRelationshipDto));
     }
+
+    @PostMapping("/unfollow")
+    public ResponseEntity<?> unfollowUser(@RequestBody UserRelationshipDto userRelationshipDto) {
+        return ResponseEntity.ok().body(userRelationshipService.unfollowUser(userRelationshipDto));
+    }
+
+    @PostMapping("/block")
+    public ResponseEntity<?> blockUser(@RequestBody UserRelationshipDto userRelationshipDto) {
+        return ResponseEntity.ok().body(userRelationshipService.blockUser(userRelationshipDto));
+    }
+
+    @PostMapping("/unblock")
+    public ResponseEntity<?> unblockUser(@RequestBody UserRelationshipDto userRelationshipDto) {
+        return ResponseEntity.ok().body(userRelationshipService.unblockUser(userRelationshipDto));
+    }
 }
