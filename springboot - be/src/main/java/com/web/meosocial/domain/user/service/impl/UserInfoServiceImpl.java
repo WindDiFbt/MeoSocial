@@ -8,7 +8,7 @@ import com.web.meosocial.domain.user.model.UserInfo;
 import com.web.meosocial.domain.user.repository.UserInfoRepository;
 import com.web.meosocial.domain.user.service.UserInfoService;
 import com.web.meosocial.domain.user.service.UserService;
-import com.web.meosocial.domain.validation.service.ValidationService;
+import com.web.meosocial.domain.validator.service.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

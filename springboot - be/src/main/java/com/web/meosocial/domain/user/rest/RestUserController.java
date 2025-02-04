@@ -24,16 +24,20 @@ public class RestUserController {
     @Autowired
     private UserRelationshipService userRelationshipService;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> addUser(@RequestBody UserDto userDto) {
-        userService.addUser(userDto);
-        return ResponseEntity.ok().body("User added successfully");
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login() {
-        return ResponseEntity.ok("User login successful");
-    }
+//    @PostMapping("/register")
+//    public ResponseEntity<?> addUser(@RequestBody UserDto userDto) {
+//        userService.addUser(userDto);
+//        return ResponseEntity.ok().body("User added successfully");
+//    }
+//
+//    @PostMapping("/login")
+//    public ResponseEntity<ApiResponseDto<?>> login() {
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .body(ApiResponseDto.builder()
+//                        .status(String.valueOf(HttpStatus.OK.value()))
+//                        .message("Spring Security and JWT")
+//                        .build());
+//    }
 
     @PostMapping("/password/change")
     public ResponseEntity<?> changePasswordUser(@RequestBody ChangePasswordDto changePasswordDto) {

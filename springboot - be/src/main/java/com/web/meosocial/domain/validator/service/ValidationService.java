@@ -1,5 +1,6 @@
-package com.web.meosocial.domain.validation.service;
+package com.web.meosocial.domain.validator.service;
 
+import com.web.meosocial.auth.dto.RegisterRequestDto;
 import com.web.meosocial.domain.user.dto.ChangePasswordDto;
 import com.web.meosocial.domain.user.dto.UserDto;
 import com.web.meosocial.domain.user.dto.UserInfoDto;
@@ -10,7 +11,7 @@ import java.io.IOException;
 
 @Service
 public interface ValidationService {
-    void getUserRegisterError(UserDto userDto);
+    void getUserRegisterError(RegisterRequestDto registerRequestDto);
 
     void getUserInfoUpdateError(UserInfoDto userInfoDto);
 
