@@ -1,5 +1,6 @@
 package com.web.meosocial.domain.user.model;
 
+import com.web.meosocial.domain.user.dto.RoleDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -23,5 +24,10 @@ public class Role implements GrantedAuthority {
     @Override
     public String getAuthority() {
         return name;
+    }
+
+    public Role(RoleDto roleDto) {
+        this.id = roleDto.getId();
+        this.name = roleDto.getName();
     }
 }

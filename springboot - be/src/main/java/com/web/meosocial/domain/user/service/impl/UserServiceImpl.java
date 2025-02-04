@@ -5,9 +5,10 @@ import com.web.meosocial.domain.user.dto.ChangePasswordDto;
 import com.web.meosocial.domain.user.dto.UserDto;
 import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.repository.UserRepository;
-import com.web.meosocial.domain.user.service.UserRoleService;
+import com.web.meosocial.domain.user.service.RoleService;
 import com.web.meosocial.domain.user.service.UserService;
-import com.web.meosocial.domain.validation.service.ValidationService;
+import com.web.meosocial.domain.validator.service.ValidationService;
+import com.web.meosocial.exception.RoleNotFoundException;
 import com.web.meosocial.util.UUID64Generator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,7 +26,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private UserRoleService userRoleService;
+    private RoleService roleService;
     @Autowired
     private ValidationService validationService;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -36,27 +37,27 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll().stream().map(UserDto::new).collect(Collectors.toList());
     }
 
-    @Transactional
-    @Override
-    public UserDto addUser(UserDto userDto) {
-        if (userDto.getUserName() == null || userDto.getPassword() == null) {
-            throw new IllegalArgumentException("Username and password are required");
-        }
-        Optional<User> list = userRepository.findByUserName(userDto.getUserName());
-        if (list.isPresent()) {
-            throw new IllegalArgumentException("Username already exists");
-        }
-        validationService.getUserRegisterError(userDto);
-        User user = new User();
-        user.setUserName(userDto.getUserName());
-        user.setId(uuid64Generator.generateUUID64());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setUserStatus(Enums.UserStatus.AVAILABLE.getValue());
-        user.setCreatedAt(LocalDateTime.now());
-        userRepository.save(user);
-        userRoleService.assignRole(user.getId(), Enums.RoleNames.ROLE_USER.toString());
-        return new UserDto(user);
-    }
+//    @Transactional
+//    @Override
+//    public UserDto addUser(UserDto userDto) throws RoleNotFoundException {
+//        if (userDto.getUserName() == null || userDto.getPassword() == null) {
+//            throw new IllegalArgumentException("Username and password are required");
+//        }
+//        Optional<User> list = userRepository.findByUserName(userDto.getUserName());
+//        if (list.isPresent()) {
+//            throw new IllegalArgumentException("Username already exists");
+//        }
+//        validationService.getUserRegisterError(userDto);
+//        User user = new User();
+//        user.setUserName(userDto.getUserName());
+//        user.setId(uuid64Generator.generateUUID64());
+//        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+//        user.setUserStatus(Enums.UserStatus.AVAILABLE.getValue());
+//        user.setCreatedAt(LocalDateTime.now());
+//        userRepository.save(user);
+//        userRoleService.assignRole(user.getId(), Enums.RoleNames.ROLE_USER.toString());
+//        return new UserDto(user);
+//    }
 
     @Transactional
     @Override
@@ -87,5 +88,15 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("User not found or not available.");
         }
         return user;
+    }
+
+    @Override
+    public boolean existsByUserName(String username) {
+        return userRepository.existsByUserName(username);
+    }
+
+    @Override
+    public void saveUser(User user) {
+        userRepository.save(user);
     }
 }

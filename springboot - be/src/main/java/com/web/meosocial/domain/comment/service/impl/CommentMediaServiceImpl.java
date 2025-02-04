@@ -8,7 +8,7 @@ import com.web.meosocial.domain.comment.model.CommentMedia;
 import com.web.meosocial.domain.comment.repository.CommentMediaRepository;
 import com.web.meosocial.domain.comment.repository.CommentRepository;
 import com.web.meosocial.domain.comment.service.CommentMediaService;
-import com.web.meosocial.domain.validation.service.ValidationService;
+import com.web.meosocial.domain.validator.service.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

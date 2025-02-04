@@ -1,9 +1,11 @@
-package com.web.meosocial.domain.validation.service.impl;
+package com.web.meosocial.domain.validator.service.impl;
 
+import com.web.meosocial.auth.dto.RegisterRequestDto;
 import com.web.meosocial.domain.user.dto.ChangePasswordDto;
 import com.web.meosocial.domain.user.dto.UserDto;
 import com.web.meosocial.domain.user.dto.UserInfoDto;
-import com.web.meosocial.domain.validation.service.ValidationService;
+import com.web.meosocial.domain.validator.service.ValidationService;
+import com.web.meosocial.exception.ValidationException;
 import com.web.meosocial.util.ValidationUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,10 +16,10 @@ import java.util.List;
 @Service
 public class ValidationServiceImpl implements ValidationService {
     @Override
-    public void getUserRegisterError(UserDto userDto) {
+    public void getUserRegisterError(RegisterRequestDto registerRequestDto) {
         List<String> errorMessages = new ArrayList<>();
-        errorMessages.add(ValidationUtil.validateUsername(userDto.getUserName()));
-        errorMessages.add(ValidationUtil.validatePassword(userDto.getPassword()));
+        errorMessages.add(ValidationUtil.validateUsername(registerRequestDto.getUserName()));
+        errorMessages.add(ValidationUtil.validatePassword(registerRequestDto.getPassword()));
         throwError(errorMessages);
     }
 
@@ -41,7 +43,7 @@ public class ValidationServiceImpl implements ValidationService {
     private void throwError(List<String> errorMessages) {
         errorMessages.removeIf(e -> e == null || e.trim().isEmpty());
         if (!errorMessages.isEmpty()) {
-            throw new IllegalArgumentException(String.join("\n", errorMessages));
+            throw new ValidationException(errorMessages);
         }
     }
 

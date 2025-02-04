@@ -7,24 +7,19 @@ import com.web.meosocial.domain.post.model.Post;
 import com.web.meosocial.domain.post.model.SavedPost;
 import com.web.meosocial.domain.user.dto.UserDto;
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
+public class User {
     @Id
     @Column(name = "id", nullable = false)
     private Long id;
@@ -83,39 +78,5 @@ public class User implements UserDetails {
             this.createdAt = userDto.getCreatedAt();
             this.updatedAt = userDto.getUpdatedAt();
         }
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
-    }
-
-    @Override
-    public String getUsername() {
-        return "";
     }
 }
