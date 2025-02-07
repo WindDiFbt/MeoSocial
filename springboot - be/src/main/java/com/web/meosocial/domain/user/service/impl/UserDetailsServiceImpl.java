@@ -1,4 +1,4 @@
-package com.web.meosocial.security;
+package com.web.meosocial.domain.user.service.impl;
 
 import com.web.meosocial.domain.user.model.UserDetailsImpl;
 import com.web.meosocial.domain.user.model.User;

@@ -91,7 +91,7 @@ public class AuthServiceImpl implements AuthService {
 
     private User createUser(RegisterRequestDto registerRequestDto) throws RoleNotFoundException {
         validationService.getUserRegisterError(registerRequestDto);
-          return User.builder()
+        return User.builder()
                 .id(uuid64Generator.generateUUID64())
                 .userName(registerRequestDto.getUserName())
                 .password(passwordEncoder.encode(registerRequestDto.getPassword()))

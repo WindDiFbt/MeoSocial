@@ -88,7 +88,8 @@ public class PostServiceImpl implements PostService {
         return new PostDto(post);
     }
 
-    private Post getPostById(String postId) {
+    @Override
+    public Post getPostById(String postId) {
         Post post = postRepository.findById(postId).orElse(null);
         if (post == null || post.getIsDelete()) {
             throw new IllegalArgumentException("Post Not Found or deleted: " + postId);
