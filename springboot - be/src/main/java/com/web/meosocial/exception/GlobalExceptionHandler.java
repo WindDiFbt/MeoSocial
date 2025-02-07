@@ -65,6 +65,18 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(value = UnauthorizedException.class)
+    public ResponseEntity<ApiResponseDto<?>> UnauthorizedExceptionHandler(UnauthorizedException exception) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(
+                        ApiResponseDto.builder()
+                                .status(String.valueOf((HttpStatus.UNAUTHORIZED)))
+                                .message(List.of(exception.getMessage()))
+                                .build()
+                );
+    }
+
 //    @ExceptionHandler(RuntimeException.class)
 //    public ResponseEntity<?> handleException(RuntimeException e) {
 //        Map<String, Object> errorResponse = new HashMap<>();
