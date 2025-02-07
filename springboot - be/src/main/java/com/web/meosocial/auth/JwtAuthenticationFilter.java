@@ -1,6 +1,6 @@
 package com.web.meosocial.auth;
 
-import com.web.meosocial.security.UserDetailsServiceImpl;
+import com.web.meosocial.domain.user.service.impl.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
