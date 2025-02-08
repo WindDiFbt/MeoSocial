@@ -1,8 +1,7 @@
 package com.web.meosocial.domain.validator.service.impl;
 
-import com.web.meosocial.auth.dto.RegisterRequestDto;
+import com.web.meosocial.payload.RegisterRequestDto;
 import com.web.meosocial.domain.user.dto.ChangePasswordDto;
-import com.web.meosocial.domain.user.dto.UserDto;
 import com.web.meosocial.domain.user.dto.UserInfoDto;
 import com.web.meosocial.domain.validator.service.ValidationService;
 import com.web.meosocial.exception.ValidationException;

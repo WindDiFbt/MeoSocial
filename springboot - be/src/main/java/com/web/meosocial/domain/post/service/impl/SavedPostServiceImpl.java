@@ -8,15 +8,16 @@ import com.web.meosocial.domain.post.service.PostService;
 import com.web.meosocial.domain.post.service.SavedPostService;
 import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.service.UserService;
-import com.web.meosocial.exception.UnauthorizedException;
+import com.web.meosocial.payload.ApiResponseDto;
+import com.web.meosocial.util.ApiResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class SavedPostServiceImpl implements SavedPostService {
@@ -26,25 +27,28 @@ public class SavedPostServiceImpl implements SavedPostService {
     private PostService postService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ApiResponseUtil apiResponseUtil;
 
     @Override
-    public List<SavedPostDto> getAllPostsSaved(Long userId) {
-        return savedPostRepository.findByUserId(userId).stream().map(SavedPostDto::new).collect(Collectors.toList());
+    public ApiResponseDto<List<SavedPostDto>> getAllPostsSaved(Long userId) {
+        List<SavedPostDto> list = savedPostRepository.findByUserId(userId)
+                .stream()
+                .map(SavedPostDto::new)
+                .toList();
+        return apiResponseUtil.success(list, "Get all saved posts successfully!");
     }
 
     @Transactional
     @Override
-    public SavedPostDto savePost(Long userId, String postId) {
-        if (userId == null) {
-            throw new UnauthorizedException("User not authorized");
-        }
+    public ApiResponseDto<SavedPostDto> savePost(Long userId, String postId) {
         SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(userId, postId);
         if (savedPost != null) {
             if (savedPost.getIsDelete()) {
                 savedPost.setIsDelete(false);
                 savedPost.setSavedAt(LocalDateTime.now());
                 savedPostRepository.save(savedPost);
-                return new SavedPostDto(savedPost);
+                return apiResponseUtil.success(new SavedPostDto(savedPost), "Saved post successfully!");
             } else {
                 throw new IllegalArgumentException("Post already saved!");
             }
@@ -58,12 +62,16 @@ public class SavedPostServiceImpl implements SavedPostService {
         newSavePost.setSavedAt(LocalDateTime.now());
         newSavePost.setIsDelete(false);
         savedPostRepository.save(newSavePost);
-        return new SavedPostDto(newSavePost);
+        return ApiResponseDto.<SavedPostDto>builder()
+                .status(String.valueOf(HttpStatus.OK))
+                .message(List.of("Saved post successfully!"))
+                .response(new SavedPostDto(newSavePost))
+                .build();
     }
 
     @Transactional
     @Override
-    public void deleteSavedPost(Long userId, String savedPostId) {
+    public ApiResponseDto<Void> deleteSavedPost(Long userId, String savedPostId) {
         SavedPost savedPost = savedPostRepository.findById(savedPostId).orElseThrow(() -> new IllegalArgumentException("Saved Post not found"));
         if (!savedPost.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException("User is not authorized to delete this post");
@@ -73,5 +81,6 @@ public class SavedPostServiceImpl implements SavedPostService {
         }
         savedPost.setIsDelete(true);
         savedPostRepository.save(savedPost);
+        return apiResponseUtil.success(null, "Deleted post successfully!");
     }
 }

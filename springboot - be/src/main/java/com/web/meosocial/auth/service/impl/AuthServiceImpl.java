@@ -1,10 +1,10 @@
 package com.web.meosocial.auth.service.impl;
 
 import com.web.meosocial.auth.JwtUtils;
-import com.web.meosocial.auth.dto.ApiResponseDto;
-import com.web.meosocial.auth.dto.LoginRequestDto;
-import com.web.meosocial.auth.dto.LoginResponseDto;
-import com.web.meosocial.auth.dto.RegisterRequestDto;
+import com.web.meosocial.payload.ApiResponseDto;
+import com.web.meosocial.payload.LoginRequestDto;
+import com.web.meosocial.payload.LoginResponseDto;
+import com.web.meosocial.payload.RegisterRequestDto;
 import com.web.meosocial.auth.service.AuthService;
 import com.web.meosocial.constant.Enums;
 import com.web.meosocial.domain.user.dto.RoleDto;
