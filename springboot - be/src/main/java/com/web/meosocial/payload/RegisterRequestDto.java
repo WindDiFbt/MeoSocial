@@ -1,4 +1,4 @@
-package com.web.meosocial.auth.dto;
+package com.web.meosocial.payload;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

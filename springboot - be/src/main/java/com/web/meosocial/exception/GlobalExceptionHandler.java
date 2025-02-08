@@ -1,10 +1,11 @@
 package com.web.meosocial.exception;
 
-import com.web.meosocial.auth.dto.ApiResponseDto;
+import com.web.meosocial.payload.ApiResponseDto;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -13,14 +14,6 @@ import java.util.List;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class GlobalExceptionHandler {
-//    @ExceptionHandler(IllegalArgumentException.class)
-//    public ResponseEntity<?> handleException(IllegalArgumentException e) {
-//        Map<String, Object> errorResponse = new HashMap<>();
-//        errorResponse.put("Messages", e.getMessage().trim().split("\n"));
-//        errorResponse.put("Error Code", HttpStatus.BAD_REQUEST.value());
-//        return ResponseEntity.badRequest().body(errorResponse);
-//    }
-
     @ExceptionHandler(value = IllegalArgumentException.class)
     public ResponseEntity<ApiResponseDto<?>> illegalArgumentExceptionHandler(IllegalArgumentException ex) {
         return ResponseEntity.badRequest().body(
@@ -71,17 +64,21 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(
                         ApiResponseDto.builder()
-                                .status(String.valueOf((HttpStatus.UNAUTHORIZED)))
+                                .status(String.valueOf(HttpStatus.UNAUTHORIZED))
                                 .message(List.of(exception.getMessage()))
                                 .build()
                 );
     }
 
-//    @ExceptionHandler(RuntimeException.class)
-//    public ResponseEntity<?> handleException(RuntimeException e) {
-//        Map<String, Object> errorResponse = new HashMap<>();
-//        errorResponse.put("Messages", e.getMessage().trim().split("\n"));
-//        errorResponse.put("Error Code", HttpStatus.BAD_REQUEST.value());
-//        return ResponseEntity.badRequest().body(errorResponse);
-//    }
+    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiResponseDto<?>> HttpRequestMethodNotSupportedExceptionHandler(HttpRequestMethodNotSupportedException exception) {
+        return ResponseEntity
+                .status(HttpStatus.METHOD_NOT_ALLOWED)
+                .body(
+                        ApiResponseDto.builder()
+                                .status(String.valueOf(HttpStatus.METHOD_NOT_ALLOWED))
+                                .message(List.of(exception.getMessage()))
+                                .build()
+                );
+    }
 }

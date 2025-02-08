@@ -51,7 +51,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostDto> getAllPostsOfUser(Long userId) {
         User user = userService.getUserById(userId);
-        List<Post> posts = postRepository.findPostExistWithUserId(user.getId());
+        List<Post> posts = postRepository.findAllByUserId(user.getId());
         posts.forEach(post ->
                 post.setPostmedia(post.getPostmedia().stream()
                         .filter(pm -> !pm.getIsDelete()).collect(Collectors.toList()))

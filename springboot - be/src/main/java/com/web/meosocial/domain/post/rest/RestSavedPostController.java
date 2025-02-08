@@ -26,10 +26,9 @@ public class RestSavedPostController {
         return ResponseEntity.ok().body(savedPostService.getAllPostsSaved(userId));
     }
 
-    @PostMapping("/{savedPostId}")
+    @PatchMapping("/remove/{savedPostId}")
     public ResponseEntity<?> deleteSavedPost(@PathVariable String savedPostId) {
         Long userId = authUtils.getCurrentUserId();
-        savedPostService.deleteSavedPost(userId, savedPostId);
-        return ResponseEntity.ok().body("Post remove successfully");
+        return ResponseEntity.ok().body(savedPostService.deleteSavedPost(userId, savedPostId));
     }
 }
