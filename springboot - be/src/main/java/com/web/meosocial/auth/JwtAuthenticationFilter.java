@@ -1,5 +1,6 @@
 package com.web.meosocial.auth;
 
+import com.web.meosocial.auth.service.RedisService;
 import com.web.meosocial.domain.user.service.impl.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,6 +21,8 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtils jwtUtils;
+    @Autowired
+    private RedisService redisService;
 
     @Autowired
     UserDetailsServiceImpl userDetailsService;
@@ -30,15 +33,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = getToken(request);
             if (jwt != null && jwtUtils.validateToken(jwt)) {
-                String userName = jwtUtils.claimUserName(jwt);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities());
-                authentication.setDetails(authentication);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                Long userId = jwtUtils.claimUserId(jwt);
+                String storedJwt = redisService.getToken(userId);
+                if (storedJwt != null && storedJwt.equals(jwt)) {
+                    UserDetails userDetails = userDetailsService.loadUserByUserId(userId);
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities());
+                    authentication.setDetails(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    logger.error("Invalid token or token not found in Redis.");
+                }
             }
         } catch (Exception e) {
             logger.error(e.getMessage());

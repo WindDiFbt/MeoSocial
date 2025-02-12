@@ -38,20 +38,24 @@ public class JwtUtils {
     public String generateToken(Authentication authentication) {
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
         return Jwts.builder()
-                .setSubject(userPrincipal.getUsername())
+                .setSubject(userPrincipal.getId().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key())
                 .compact();
     }
 
-    public String claimUserName(String token) {
-        return Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(token).getBody().getSubject();
+    public Long claimUserId(String token) {
+        return Long.parseLong(Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(token).getBody().getSubject());
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(token);
+            Jwts.parserBuilder()
+                    .setSigningKey(key())
+                    .setAllowedClockSkewSeconds(300)
+                    .build()
+                    .parseClaimsJws(token);
             return true;
         } catch (MalformedJwtException e) {
             logger.error("Invalid JWT token: {}", e.getMessage());
