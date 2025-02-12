@@ -1,11 +1,8 @@
 package com.web.meosocial.auth.service.impl;
 
 import com.web.meosocial.auth.JwtUtils;
-import com.web.meosocial.payload.ApiResponseDto;
-import com.web.meosocial.payload.LoginRequestDto;
-import com.web.meosocial.payload.LoginResponseDto;
-import com.web.meosocial.payload.RegisterRequestDto;
 import com.web.meosocial.auth.service.AuthService;
+import com.web.meosocial.auth.service.RedisService;
 import com.web.meosocial.constant.Enums;
 import com.web.meosocial.domain.user.dto.RoleDto;
 import com.web.meosocial.domain.user.model.Role;
@@ -16,6 +13,10 @@ import com.web.meosocial.domain.user.service.UserService;
 import com.web.meosocial.domain.validator.service.ValidationService;
 import com.web.meosocial.exception.RoleNotFoundException;
 import com.web.meosocial.exception.UserAlreadyExistsException;
+import com.web.meosocial.payload.ApiResponseDto;
+import com.web.meosocial.payload.LoginRequestDto;
+import com.web.meosocial.payload.LoginResponseDto;
+import com.web.meosocial.payload.RegisterRequestDto;
 import com.web.meosocial.util.UUID64Generator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,6 +47,8 @@ public class AuthServiceImpl implements AuthService {
     private JwtUtils jwtUtils;
     @Autowired
     private ValidationService validationService;
+    @Autowired
+    private RedisService redisService;
     private final UUID64Generator uuid64Generator = new UUID64Generator();
 
     @Override
@@ -55,6 +58,7 @@ public class AuthServiceImpl implements AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtUtils.generateToken(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        redisService.saveToken(userDetails.getId(), token, 3600L);
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority).toList();
         LoginResponseDto loginResponseDto = LoginResponseDto.builder()
@@ -120,5 +124,17 @@ public class AuthServiceImpl implements AuthService {
             }
         }
         return roles;
+    }
+
+    @Override
+    public ResponseEntity<ApiResponseDto<?>> logout(Long userId) {
+        redisService.deleteToken(userId);
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.ok(
+                ApiResponseDto.builder()
+                        .status(String.valueOf(HttpStatus.OK))
+                        .message(List.of("Logged out successfully!"))
+                        .build()
+        );
     }
 }
