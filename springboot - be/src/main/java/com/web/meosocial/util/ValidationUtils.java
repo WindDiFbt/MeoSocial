@@ -2,7 +2,7 @@ package com.web.meosocial.util;
 
 import java.time.LocalDate;
 
-public class ValidationUtil {
+public class ValidationUtils {
 
     public static String validateUsername(String username) {
         if (username.contains(" ")) {

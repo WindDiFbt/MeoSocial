@@ -9,7 +9,7 @@ import com.web.meosocial.domain.post.service.SavedPostService;
 import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.service.UserService;
 import com.web.meosocial.payload.ApiResponseDto;
-import com.web.meosocial.util.ApiResponseUtil;
+import com.web.meosocial.util.ApiResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class SavedPostServiceImpl implements SavedPostService {
     @Autowired
     private UserService userService;
     @Autowired
-    private ApiResponseUtil apiResponseUtil;
+    private ApiResponseUtils apiResponseUtils;
 
     @Override
     public ApiResponseDto<List<SavedPostDto>> getAllPostsSaved(Long userId) {
@@ -36,7 +36,7 @@ public class SavedPostServiceImpl implements SavedPostService {
                 .stream()
                 .map(SavedPostDto::new)
                 .toList();
-        return apiResponseUtil.success(list, "Get all saved posts successfully!");
+        return apiResponseUtils.success(list, "Get all saved posts successfully!");
     }
 
     @Transactional
@@ -48,7 +48,7 @@ public class SavedPostServiceImpl implements SavedPostService {
                 savedPost.setIsDelete(false);
                 savedPost.setSavedAt(LocalDateTime.now());
                 savedPostRepository.save(savedPost);
-                return apiResponseUtil.success(new SavedPostDto(savedPost), "Saved post successfully!");
+                return apiResponseUtils.success(new SavedPostDto(savedPost), "Saved post successfully!");
             } else {
                 throw new IllegalArgumentException("Post already saved!");
             }
@@ -81,6 +81,6 @@ public class SavedPostServiceImpl implements SavedPostService {
         }
         savedPost.setIsDelete(true);
         savedPostRepository.save(savedPost);
-        return apiResponseUtil.success(null, "Deleted post successfully!");
+        return apiResponseUtils.success(null, "Deleted post successfully!");
     }
 }

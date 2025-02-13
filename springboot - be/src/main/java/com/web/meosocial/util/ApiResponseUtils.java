@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class ApiResponseUtil {
+public class ApiResponseUtils {
     public <T> ApiResponseDto<T> success(T response, String message) {
         return ApiResponseDto.<T>builder()
                 .status(String.valueOf(HttpStatus.OK))

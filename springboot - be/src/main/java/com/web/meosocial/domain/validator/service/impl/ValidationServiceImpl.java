@@ -5,7 +5,7 @@ import com.web.meosocial.domain.user.dto.ChangePasswordDto;
 import com.web.meosocial.domain.user.dto.UserInfoDto;
 import com.web.meosocial.domain.validator.service.ValidationService;
 import com.web.meosocial.exception.ValidationException;
-import com.web.meosocial.util.ValidationUtil;
+import com.web.meosocial.util.ValidationUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,25 +17,25 @@ public class ValidationServiceImpl implements ValidationService {
     @Override
     public void getUserRegisterError(RegisterRequestDto registerRequestDto) {
         List<String> errorMessages = new ArrayList<>();
-        errorMessages.add(ValidationUtil.validateUsername(registerRequestDto.getUserName()));
-        errorMessages.add(ValidationUtil.validatePassword(registerRequestDto.getPassword()));
+        errorMessages.add(ValidationUtils.validateUsername(registerRequestDto.getUserName()));
+        errorMessages.add(ValidationUtils.validatePassword(registerRequestDto.getPassword()));
         throwError(errorMessages);
     }
 
     @Override
     public void getUserInfoUpdateError(UserInfoDto userInfoDto) {
         List<String> errorMessages = new ArrayList<>();
-        errorMessages.add(ValidationUtil.validateFullName(userInfoDto.getFullName()));
-        errorMessages.add(ValidationUtil.validateEmail(userInfoDto.getEmail()));
-        errorMessages.add(ValidationUtil.validatePhone(userInfoDto.getPhoneNumber()));
-        errorMessages.add(ValidationUtil.validateDOB(userInfoDto.getDateOfBirth()));
+        errorMessages.add(ValidationUtils.validateFullName(userInfoDto.getFullName()));
+        errorMessages.add(ValidationUtils.validateEmail(userInfoDto.getEmail()));
+        errorMessages.add(ValidationUtils.validatePhone(userInfoDto.getPhoneNumber()));
+        errorMessages.add(ValidationUtils.validateDOB(userInfoDto.getDateOfBirth()));
         throwError(errorMessages);
     }
 
     @Override
     public void getUserChangePasswordError(ChangePasswordDto changePasswordDto) {
         List<String> errorMessages = new ArrayList<>();
-        errorMessages.add(ValidationUtil.validatePassword(changePasswordDto.getNewPassword()));
+        errorMessages.add(ValidationUtils.validatePassword(changePasswordDto.getNewPassword()));
         throwError(errorMessages);
     }
 
