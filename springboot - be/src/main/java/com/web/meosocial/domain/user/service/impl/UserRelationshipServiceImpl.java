@@ -5,6 +5,7 @@ import com.web.meosocial.domain.user.dto.UserRelationshipDto;
 import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.model.UserRelationship;
 import com.web.meosocial.domain.user.repository.UserRelationshipRepository;
+import com.web.meosocial.domain.user.repository.UserRepository;
 import com.web.meosocial.domain.user.service.UserRelationshipService;
 import com.web.meosocial.domain.user.service.UserService;
 import com.web.meosocial.util.UUID64Generator;
@@ -24,6 +25,8 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
     private UserService userService;
     private final UUID64Generator uuid64Generator = new UUID64Generator();
     private static final Logger LOGGER = LoggerFactory.getLogger(UserRelationshipServiceImpl.class);
+    @Autowired
+    private UserRepository userRepository;
 
     /**
      * This method checks if the follower and following users are different, retrieves the users and their current relationships
@@ -260,5 +263,15 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
         LOGGER.info("Updating relationship: relationshipId - {}, status - {}, hasMutualFollow - {}",
                 userRelationshipExisted.getId(), status, hasMutualFollow);
         userRelaRepository.save(userRelationshipExisted);
+    }
+
+    @Override
+    public Boolean IsUserRelaMutualFollow(Long followerId, Long followingId) {
+        return userRelaRepository.getUserRelationship(followerId, followingId).getHasMutualFollow();
+    }
+
+    @Override
+    public Boolean IsUserFollow(Long followerId, Long followingId) {
+        return userRelaRepository.getUserRelationship(followerId, followingId).getStatus().equals(Enums.RelationshipStatus.FOLLOW.getValue());
     }
 }
