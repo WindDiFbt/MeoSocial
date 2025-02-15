@@ -31,13 +31,22 @@ public class Enums {
     @Getter
     public enum VisibilityLevel {
         PUBLIC(1),
-        PRIVATE(2),
+        FOLLOWER(2),
         FRIENDS(3),
-        FOLLOWER(4);
+        PRIVATE(4);
         private final Integer value;
 
         private VisibilityLevel(Integer value) {
             this.value = value;
+        }
+
+        public static VisibilityLevel fromValue(int value) {
+            for (VisibilityLevel level : VisibilityLevel.values()) {
+                if (level.getValue() == value) {
+                    return level;
+                }
+            }
+            throw new IllegalArgumentException("Unexpected value: " + value);
         }
     }
 
