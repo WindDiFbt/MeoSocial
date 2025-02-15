@@ -1,8 +1,8 @@
 package com.web.meosocial.domain.post.model;
 
 import com.web.meosocial.domain.comment.model.Comment;
-import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.post.dto.PostDto;
+import com.web.meosocial.domain.user.model.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,20 +32,20 @@ public class Post {
     @Column(name = "is_delete")
     private Boolean isDelete;
 
-    @Column(name = "shared_post_id")
+    @Column(name = "is_shared_post")
+    private Boolean isSharedPost;
+
+    @Column(name = "shared_post_id", length = 36)
     private String sharedPostId;
 
-    @Column(name = "shared_by_user_id")
-    private Long sharedByUserId;
+    @Column(name = "is_shared_post_available")
+    private Boolean isSharedPostAvailable;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @Column(name = "shared_at")
-    private LocalDateTime sharedAt;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
@@ -68,11 +68,11 @@ public class Post {
             this.content = postDto.getContent();
             this.visibilityLevel = postDto.getVisibilityLevel();
             this.isDelete = postDto.getIsDelete();
+            this.isSharedPost = postDto.getIsSharedPost();
             this.sharedPostId = postDto.getSharedPostId();
-            this.sharedByUserId = postDto.getSharedByUserId();
+            this.isSharedPostAvailable = postDto.getIsSharedPostAvailable();
             this.createdAt = postDto.getCreatedAt();
             this.updatedAt = postDto.getUpdatedAt();
-            this.sharedAt = postDto.getSharedAt();
             if (postDto.getUserId() != null) {
                 this.user = new User();
                 this.user.setId(postDto.getUserId());

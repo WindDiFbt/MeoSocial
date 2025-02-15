@@ -1,5 +1,6 @@
 package com.web.meosocial.domain.post.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.web.meosocial.domain.post.model.Post;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,17 +11,18 @@ import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostDto {
     private String id;
     private Long userId;
     private String content;
     private Integer visibilityLevel;
     private Boolean isDelete;
+    private Boolean isSharedPost;
     private String sharedPostId;
-    private Long sharedByUserId;
+    private Boolean isSharedPostAvailable;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private LocalDateTime sharedAt;
     private LocalDateTime deletedAt;
 
     private List<PostMediaDto> media;
@@ -34,10 +36,10 @@ public class PostDto {
             this.visibilityLevel = post.getVisibilityLevel();
             this.isDelete = post.getIsDelete();
             this.sharedPostId = post.getSharedPostId();
-            this.sharedByUserId = post.getSharedByUserId();
+            this.isSharedPost = post.getIsSharedPost();
+            this.isSharedPostAvailable = post.getIsSharedPostAvailable();
             this.createdAt = post.getCreatedAt();
             this.updatedAt = post.getUpdatedAt();
-            this.sharedAt = post.getSharedAt();
             this.deletedAt = post.getDeletedAt();
             if (post.getPostmedia() != null) {
                 this.media = post.getPostmedia().stream().map(PostMediaDto::new).collect(Collectors.toList());

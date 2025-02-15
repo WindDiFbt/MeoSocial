@@ -15,4 +15,7 @@ public interface UserRelationshipService {
 
     UserRelationshipDto getUserRelationshipById(Long id);
 
+    Boolean IsUserRelaMutualFollow(Long followerId, Long followingId);
+
+    Boolean IsUserFollow(Long followerId, Long followingId);
 }

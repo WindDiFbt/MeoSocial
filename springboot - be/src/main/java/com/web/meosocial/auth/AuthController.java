@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     @Autowired
     private AuthService authService;
+    @Autowired
+    private AuthUtils authUtils;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponseDto<?>> login(@RequestBody @Valid LoginRequestDto loginRequestDto) {
@@ -29,7 +31,8 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponseDto<?>> logout(@RequestParam Long userId) {
+    public ResponseEntity<ApiResponseDto<?>> logout() {
+        long userId = authUtils.getCurrentUserId();
         return authService.logout(userId);
     }
 }

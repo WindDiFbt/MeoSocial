@@ -1,7 +1,7 @@
 package com.web.meosocial.domain.post.model;
 
 import com.web.meosocial.domain.user.model.User;
-import com.web.meosocial.domain.post.dto.LikeDto;
+import com.web.meosocial.domain.post.dto.LikePostDto;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,14 +28,14 @@ public class Like {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public Like(LikeDto likeDto) {
-        if (likeDto != null) {
-            this.id = likeDto.getId();
-            this.createdAt = likeDto.getCreatedAt();
+    public Like(LikePostDto likePostDto) {
+        if (likePostDto != null) {
+            this.id = likePostDto.getId();
+            this.createdAt = likePostDto.getCreatedAt();
             this.user = new User();
-            this.user.setId(likeDto.getUserId());
+            this.user.setId(likePostDto.getUserId());
             this.post = new Post();
-            this.post.setId(likeDto.getPostId());
+            this.post.setId(likePostDto.getPostId());
         }
     }
 }

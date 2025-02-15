@@ -16,19 +16,19 @@ public class RestSavedPostController {
 
     @PostMapping("/save/{postId}")
     public ResponseEntity<?> save(@PathVariable String postId) {
-        Long userId = authUtils.getCurrentUserId();
+        long userId = authUtils.getCurrentUserId();
         return ResponseEntity.ok().body(savedPostService.savePost(userId, postId));
     }
 
     @GetMapping()
     public ResponseEntity<?> getAllSavedPosts() {
-        Long userId = authUtils.getCurrentUserId();
+        long userId = authUtils.getCurrentUserId();
         return ResponseEntity.ok().body(savedPostService.getAllPostsSaved(userId));
     }
 
     @PatchMapping("/remove/{savedPostId}")
     public ResponseEntity<?> deleteSavedPost(@PathVariable String savedPostId) {
-        Long userId = authUtils.getCurrentUserId();
+        long userId = authUtils.getCurrentUserId();
         return ResponseEntity.ok().body(savedPostService.deleteSavedPost(userId, savedPostId));
     }
 }
