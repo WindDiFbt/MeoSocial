@@ -1,7 +1,7 @@
 package com.web.meosocial.domain.user.rest;
 
+import com.web.meosocial.auth.AuthUtils;
 import com.web.meosocial.domain.user.dto.ChangePasswordDto;
-import com.web.meosocial.domain.user.dto.UserDto;
 import com.web.meosocial.domain.user.dto.UserInfoDto;
 import com.web.meosocial.domain.user.dto.UserRelationshipDto;
 import com.web.meosocial.domain.user.service.UserInfoService;
@@ -23,54 +23,32 @@ public class RestUserController {
     private UserInfoService userInfoService;
     @Autowired
     private UserRelationshipService userRelationshipService;
-
-//    @PostMapping("/register")
-//    public ResponseEntity<?> addUser(@RequestBody UserDto userDto) {
-//        userService.addUser(userDto);
-//        return ResponseEntity.ok().body("User added successfully");
-//    }
-//
-//    @PostMapping("/login")
-//    public ResponseEntity<ApiResponseDto<?>> login() {
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(ApiResponseDto.builder()
-//                        .status(String.valueOf(HttpStatus.OK.value()))
-//                        .message("Spring Security and JWT")
-//                        .build());
-//    }
+    @Autowired
+    private AuthUtils authUtils;
 
     @PostMapping("/password/change")
     public ResponseEntity<?> changePasswordUser(@RequestBody ChangePasswordDto changePasswordDto) {
-        return ResponseEntity.ok().body(userService.changePassword(changePasswordDto));
+        return ResponseEntity.ok().body(userService.changePassword(authUtils.getCurrentUserId(), changePasswordDto));
     }
 
-    @PutMapping("/status/change/{id}")
-    public ResponseEntity<?> changeStatusUser(@PathVariable Long id, @RequestBody UserDto userDto) {
-        return ResponseEntity.ok().body(userService.updateStatus(id, userDto));
+    @PutMapping("/status/change/{status}")
+    public ResponseEntity<?> changeStatusUser(@PathVariable Integer status) {
+        return ResponseEntity.ok().body(userService.updateStatus(authUtils.getCurrentUserId(), status));
     }
 
-    @GetMapping("/profiles/{id}")
-    public ResponseEntity<?> getUser(@PathVariable Long id) {
-        UserInfoDto userInfoDto = userInfoService.getUserInfo(id);
-        if (userInfoDto == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok().body(userInfoDto);
+    @GetMapping("/profiles")
+    public ResponseEntity<?> getUser() {
+        return ResponseEntity.ok().body(userInfoService.getUserInfo(authUtils.getCurrentUserId()));
     }
 
     @PatchMapping("/profiles/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserInfoDto userInfoDto) {
-        return ResponseEntity.ok().body(userInfoService.updateInformationUser(userInfoDto));
+        return ResponseEntity.ok().body(userInfoService.updateInformationUser(authUtils.getCurrentUserId(), userInfoDto));
     }
 
-    @PostMapping("/profiles/{id}")
-    public ResponseEntity<?> updateAvatar(@PathVariable Long id, @RequestParam("avatar") MultipartFile avatar) {
-        try {
-            userInfoService.updateUserAvatar(id, avatar);
-            return ResponseEntity.ok().body("Avatar updated successfully");
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body("Failed to upload avatar: " + e.getMessage());
-        }
+    @PostMapping("/profiles/update/avatar")
+    public ResponseEntity<?> updateAvatar(@RequestParam("avatar") MultipartFile avatar) throws IOException {
+        return ResponseEntity.ok().body(userInfoService.updateUserAvatar(authUtils.getCurrentUserId(), avatar));
     }
 
     @PostMapping("/follow")

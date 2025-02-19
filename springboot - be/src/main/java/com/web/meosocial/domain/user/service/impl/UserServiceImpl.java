@@ -5,20 +5,17 @@ import com.web.meosocial.domain.user.dto.ChangePasswordDto;
 import com.web.meosocial.domain.user.dto.UserDto;
 import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.repository.UserRepository;
-import com.web.meosocial.domain.user.service.RoleService;
 import com.web.meosocial.domain.user.service.UserService;
 import com.web.meosocial.domain.validator.service.ValidationService;
-import com.web.meosocial.exception.RoleNotFoundException;
-import com.web.meosocial.util.UUID64Generator;
+import com.web.meosocial.payload.ApiResponseDto;
+import com.web.meosocial.util.ApiResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,64 +23,41 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private RoleService roleService;
-    @Autowired
     private ValidationService validationService;
+    @Autowired
+    private ApiResponseUtils apiResponseUtils;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    private final UUID64Generator uuid64Generator = new UUID64Generator();
 
     @Override
-    public List<UserDto> findAll() {
-        return userRepository.findAll().stream().map(UserDto::new).collect(Collectors.toList());
+    public ApiResponseDto<List<UserDto>> findAll() {
+        return apiResponseUtils.success(userRepository.findAll().stream().map(UserDto::new).collect(Collectors.toList()), "Get all users success");
     }
-
-//    @Transactional
-//    @Override
-//    public UserDto addUser(UserDto userDto) throws RoleNotFoundException {
-//        if (userDto.getUserName() == null || userDto.getPassword() == null) {
-//            throw new IllegalArgumentException("Username and password are required");
-//        }
-//        Optional<User> list = userRepository.findByUserName(userDto.getUserName());
-//        if (list.isPresent()) {
-//            throw new IllegalArgumentException("Username already exists");
-//        }
-//        validationService.getUserRegisterError(userDto);
-//        User user = new User();
-//        user.setUserName(userDto.getUserName());
-//        user.setId(uuid64Generator.generateUUID64());
-//        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-//        user.setUserStatus(Enums.UserStatus.AVAILABLE.getValue());
-//        user.setCreatedAt(LocalDateTime.now());
-//        userRepository.save(user);
-//        userRoleService.assignRole(user.getId(), Enums.RoleNames.ROLE_USER.toString());
-//        return new UserDto(user);
-//    }
 
     @Transactional
     @Override
-    public UserDto changePassword(ChangePasswordDto changePasswordDto) {
-        User user = getUserById(changePasswordDto.getId());
+    public ApiResponseDto<UserDto> changePassword(Long userId, ChangePasswordDto changePasswordDto) {
+        User user = getUserById(userId);
         if (passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword())) {
             validationService.getUserChangePasswordError(changePasswordDto);
             user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
             userRepository.save(user);
-            return new UserDto(user);
+            return apiResponseUtils.success(new UserDto(user), "Change password success");
         }
         throw new IllegalArgumentException("Wrong old password");
     }
 
     @Transactional
     @Override
-    public UserDto updateStatus(Long id, UserDto userDto) {
-        User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
-        user.setUserStatus(userDto.getUserStatus());
+    public ApiResponseDto<UserDto> updateStatus(Long userId, Integer status) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setUserStatus(status);
         userRepository.save(user);
-        return new UserDto(user);
+        return apiResponseUtils.success(new UserDto(user), "Update status success");
     }
 
     @Override
-    public User getUserById(Long id) {
-        User user = userRepository.findById(id).orElse(null);
+    public User getUserById(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
         if (user == null || user.getUserStatus().equals(Enums.UserStatus.NOT_AVAILABLE.getValue())) {
             throw new IllegalArgumentException("User not found or not available.");
         }

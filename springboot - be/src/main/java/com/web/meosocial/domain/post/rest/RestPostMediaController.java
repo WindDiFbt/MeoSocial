@@ -1,5 +1,6 @@
 package com.web.meosocial.domain.post.rest;
 
+import com.web.meosocial.auth.AuthUtils;
 import com.web.meosocial.domain.post.service.PostMediaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,20 +12,21 @@ import org.springframework.web.multipart.MultipartFile;
 public class RestPostMediaController {
     @Autowired
     private PostMediaService postMediaService;
+    @Autowired
+    private AuthUtils authUtils;
 
     @PostMapping("/add/{postId}")
-    public ResponseEntity<?> addMedia(@PathVariable String postId, @RequestParam("file") MultipartFile file) {
-        return ResponseEntity.ok().body( postMediaService.createPostMedia(postId, file));
+    public ResponseEntity<?> addPostMedia(@PathVariable String postId, @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok().body(postMediaService.createPostMedia(authUtils.getCurrentUserId(), postId, file));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getMedia(@PathVariable String id) {
+    public ResponseEntity<?> getPostMedia(@PathVariable String id) {
         return ResponseEntity.ok().body(postMediaService.getPostMediaByPostId(id));
     }
 
     @PatchMapping("/delete/{id}")
-    public ResponseEntity<?> deleteMedia(@PathVariable String id) {
-        postMediaService.deletePostMedia(id);
-        return ResponseEntity.ok().body("Deleted Media: " + id);
+    public ResponseEntity<?> deletePostMedia(@PathVariable String id) {
+        return ResponseEntity.ok().body(postMediaService.deletePostMedia(authUtils.getCurrentUserId(), id));
     }
 }

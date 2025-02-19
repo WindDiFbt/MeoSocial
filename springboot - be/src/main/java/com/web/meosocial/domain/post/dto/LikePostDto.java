@@ -13,6 +13,7 @@ public class LikePostDto {
     private Long userId;
     private String postId;
     private LocalDateTime createdAt;
+    private Boolean isDeleted;
 
     // Constructor to map from Like entity to LikeDto
     public LikePostDto(Like like) {
@@ -21,6 +22,7 @@ public class LikePostDto {
             this.userId = like.getUser().getId();
             this.postId = like.getPost().getId();
             this.createdAt = like.getCreatedAt();
+            this.isDeleted = like.getIsDeleted();
         }
     }
 }

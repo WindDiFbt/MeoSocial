@@ -28,6 +28,9 @@ public class Like {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     public Like(LikePostDto likePostDto) {
         if (likePostDto != null) {
             this.id = likePostDto.getId();
@@ -36,6 +39,7 @@ public class Like {
             this.user.setId(likePostDto.getUserId());
             this.post = new Post();
             this.post.setId(likePostDto.getPostId());
+            this.isDeleted = likePostDto.getIsDeleted();
         }
     }
 }

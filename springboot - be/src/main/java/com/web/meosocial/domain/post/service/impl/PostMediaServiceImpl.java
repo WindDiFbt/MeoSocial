@@ -9,6 +9,9 @@ import com.web.meosocial.domain.post.repository.PostMediaRepository;
 import com.web.meosocial.domain.post.repository.PostRepository;
 import com.web.meosocial.domain.post.service.PostMediaService;
 import com.web.meosocial.domain.validator.service.ValidationService;
+import com.web.meosocial.exception.UnauthorizedException;
+import com.web.meosocial.payload.ApiResponseDto;
+import com.web.meosocial.util.ApiResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,20 +33,25 @@ public class PostMediaServiceImpl implements PostMediaService {
     private CloudinaryService cloudinaryService;
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private ApiResponseUtils apiResponseUtils;
 
     @Override
-    public List<PostMediaDto> getPostMediaByPostId(String postId) {
-        return postMediaRepository.findAllByPostId(postId, false).stream()
-                .map(PostMediaDto::new).collect(Collectors.toList());
+    public ApiResponseDto<List<PostMediaDto>> getPostMediaByPostId(String postId) {
+        return apiResponseUtils.success(postMediaRepository.findAllByPostId(postId, false).stream()
+                .map(PostMediaDto::new).collect(Collectors.toList()), "Get All Post Media of Post Id " + postId + "successfully!");
     }
 
     @Transactional
     @Override
-    public PostMediaDto createPostMedia(String postId, MultipartFile file) {
+    public ApiResponseDto<PostMediaDto> createPostMedia(Long userId, String postId, MultipartFile file) {
         PostMedia postMedia = new PostMedia();
         Post post = postRepository.findById(postId).orElse(null);
         if (post == null || post.getIsDelete()) {
             throw new IllegalArgumentException("Post Not Found or deleted: " + postId);
+        }
+        if (!post.getUser().getId().equals(userId)) {
+            throw new UnauthorizedException("You do not have authorization to create post media ");
         }
         try {
             postMedia.setPost(post);
@@ -62,7 +70,7 @@ public class PostMediaServiceImpl implements PostMediaService {
             postMedia.setCreatedAt(LocalDateTime.now());
             postMedia.setIsDelete(false);
             postMediaRepository.save(postMedia);
-            return new PostMediaDto(postMedia);
+            return apiResponseUtils.success(new PostMediaDto(postMedia), "Create Post Media of Post Id " + postId + "successfully!");
         } catch (IOException e) {
             throw new IllegalArgumentException("Error uploading media to Cloudinary: " + e.getMessage());
         }
@@ -76,13 +84,17 @@ public class PostMediaServiceImpl implements PostMediaService {
 
     @Transactional
     @Override
-    public void deletePostMedia(String postMediaId) {
+    public ApiResponseDto<Void> deletePostMedia(Long userId, String postMediaId) {
         PostMedia postMedia = postMediaRepository.findById(postMediaId).orElse(null);
         if (postMedia == null || postMedia.getIsDelete()) {
             throw new IllegalArgumentException("Post media not found");
         }
+        if (!postMedia.getPost().getUser().getId().equals(userId)) {
+            throw new UnauthorizedException("You do not have authorization to create post media ");
+        }
         postMedia.setIsDelete(true);
         postMediaRepository.save(postMedia);
+        return apiResponseUtils.success(null, "Delete Post Media of Post Id " + postMediaId + "successfully!");
     }
 
     @Transactional

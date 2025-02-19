@@ -25,8 +25,6 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
     private UserService userService;
     private final UUID64Generator uuid64Generator = new UUID64Generator();
     private static final Logger LOGGER = LoggerFactory.getLogger(UserRelationshipServiceImpl.class);
-    @Autowired
-    private UserRepository userRepository;
 
     /**
      * This method checks if the follower and following users are different, retrieves the users and their current relationships

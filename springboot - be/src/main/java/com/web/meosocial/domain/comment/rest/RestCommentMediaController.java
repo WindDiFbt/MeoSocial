@@ -1,5 +1,6 @@
 package com.web.meosocial.domain.comment.rest;
 
+import com.web.meosocial.auth.AuthUtils;
 import com.web.meosocial.domain.comment.service.CommentMediaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class RestCommentMediaController {
     @Autowired
     private CommentMediaService commentMediaService;
+    @Autowired
+    private AuthUtils authUtils;
 
     @GetMapping("/{commentId}")
     public ResponseEntity<?> getCommentMediaByCommentId(@PathVariable String commentId) {
@@ -19,12 +22,11 @@ public class RestCommentMediaController {
 
     @PostMapping("/add/{commentId}")
     public ResponseEntity<?> addCommentMedia(@PathVariable String commentId, @RequestParam("file") MultipartFile file) {
-        return ResponseEntity.ok().body(commentMediaService.createCommentMedia(commentId, file));
+        return ResponseEntity.ok().body(commentMediaService.createCommentMedia(authUtils.getCurrentUserId(), commentId, file));
     }
 
     @PatchMapping("/delete/{commentId}")
     public ResponseEntity<?> deleteCommentMedia(@PathVariable String commentId) {
-        commentMediaService.deleteCommentMedia(commentId);
-        return ResponseEntity.ok().body("Deleted comment media successfully.");
+        return ResponseEntity.ok().body(commentMediaService.deleteCommentMedia(authUtils.getCurrentUserId(), commentId));
     }
 }

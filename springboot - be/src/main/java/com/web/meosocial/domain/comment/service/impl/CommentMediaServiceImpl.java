@@ -9,6 +9,9 @@ import com.web.meosocial.domain.comment.repository.CommentMediaRepository;
 import com.web.meosocial.domain.comment.repository.CommentRepository;
 import com.web.meosocial.domain.comment.service.CommentMediaService;
 import com.web.meosocial.domain.validator.service.ValidationService;
+import com.web.meosocial.exception.UnauthorizedException;
+import com.web.meosocial.payload.ApiResponseDto;
+import com.web.meosocial.util.ApiResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,14 +33,19 @@ public class CommentMediaServiceImpl implements CommentMediaService {
     private ValidationService validationService;
     @Autowired
     private CommentRepository commentRepository;
+    @Autowired
+    private ApiResponseUtils apiResponseUtils;
 
     @Transactional
     @Override
-    public CommentMediaDto createCommentMedia(String commentId, MultipartFile file) {
+    public ApiResponseDto<CommentMediaDto> createCommentMedia(Long userId, String commentId, MultipartFile file) {
         CommentMedia commentMedia = new CommentMedia();
         Comment comment = commentRepository.findById(commentId).orElse(null);
         if (comment == null || comment.getIsDelete()) {
             throw new IllegalArgumentException("Comment not found or deleted: " + commentId);
+        }
+        if (!comment.getUser().getId().equals(userId)) {
+            throw new UnauthorizedException("You do not have authorization to create comment media");
         }
         try {
             commentMedia.setId(UUID.randomUUID().toString());
@@ -56,7 +64,7 @@ public class CommentMediaServiceImpl implements CommentMediaService {
             commentMedia.setCreatedAt(LocalDateTime.now());
             commentMedia.setIsDelete(false);
             commentMediaRepository.save(commentMedia);
-            return new CommentMediaDto(commentMedia);
+            return apiResponseUtils.success(new CommentMediaDto(commentMedia), "Created comment media successfully");
         } catch (IOException e) {
             throw new IllegalArgumentException("Error uploading media to Cloudinary: " + e.getMessage());
         }
@@ -64,13 +72,17 @@ public class CommentMediaServiceImpl implements CommentMediaService {
 
     @Transactional
     @Override
-    public void deleteCommentMedia(String commentMediaId) {
+    public ApiResponseDto<Void> deleteCommentMedia(Long userId, String commentMediaId) {
         CommentMedia commentMedia = commentMediaRepository.findById(commentMediaId).orElse(null);
         if (commentMedia == null || commentMedia.getIsDelete()) {
             throw new IllegalArgumentException("Comment not found or deleted: " + commentMediaId);
         }
+        if (!commentMedia.getComment().getUser().getId().equals(userId)) {
+            throw new UnauthorizedException("You do not have authorization to delete comment media");
+        }
         commentMedia.setIsDelete(true);
         commentMediaRepository.save(commentMedia);
+        return apiResponseUtils.success(null, "Deleted comment media successfully");
     }
 
     @Transactional
@@ -85,8 +97,8 @@ public class CommentMediaServiceImpl implements CommentMediaService {
     }
 
     @Override
-    public List<CommentMediaDto> getAllCommentMediaByCommentId(String commentId) {
-        return commentMediaRepository.findAllByCommentId(commentId).stream()
-                .map(CommentMediaDto::new).collect(Collectors.toList());
+    public ApiResponseDto<List<CommentMediaDto>> getAllCommentMediaByCommentId(String commentId) {
+        return apiResponseUtils.success(commentMediaRepository.findAllByCommentId(commentId).stream()
+                .map(CommentMediaDto::new).collect(Collectors.toList()), "Get all comment media successfully");
     }
 }
