@@ -121,17 +121,12 @@ public class PostServiceImpl implements PostService {
     /**
      * Retrieves a post by its ID and filters out deleted media.
      *
-     * @param userId The ID of the user requesting the post.
      * @param postId The ID of the post to retrieve.
      * @return ApiResponseDto&lt;PostDto&gt; containing the requested post.
-     * @throws UnauthorizedException If the user is not authorized to access the post.
      */
     @Override
-    public ApiResponseDto<PostDto> getPost(Long userId, String postId) {
+    public ApiResponseDto<PostDto> getPost( String postId) {
         Post post = getPostById(postId);
-        if (!post.getUser().getId().equals(userId)) {
-            throw new UnauthorizedException("User is not authorized to continue action!");
-        }
         post.setPostmedia(post.getPostmedia().stream()
                 .filter(pm -> !pm.getIsDelete()).collect(Collectors.toList()));
         return apiResponseUtils.success(new PostDto(post), "Post found!");

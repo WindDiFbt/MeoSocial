@@ -1,5 +1,6 @@
 package com.web.meosocial.domain.comment.rest;
 
+import com.web.meosocial.auth.AuthUtils;
 import com.web.meosocial.domain.comment.dto.CommentDto;
 import com.web.meosocial.domain.comment.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +12,12 @@ import org.springframework.web.bind.annotation.*;
 public class RestCommentController {
     @Autowired
     private CommentService commentService;
+    @Autowired
+    private AuthUtils authUtils;
 
     @PostMapping("/new")
     public ResponseEntity<?> createNewComment(@RequestBody CommentDto commentDto) {
-        return ResponseEntity.ok().body(commentService.createNewComment(commentDto));
+        return ResponseEntity.ok().body(commentService.createNewComment(authUtils.getCurrentUserId(), commentDto));
     }
 
     @GetMapping("/user/{userId}")
@@ -29,8 +32,7 @@ public class RestCommentController {
 
     @PatchMapping("/delete/{commentId}")
     public ResponseEntity<?> deleteComment(@PathVariable String commentId) {
-        commentService.deleteComment(commentId);
-        return ResponseEntity.ok("Comment deleted successfully!");
+        return ResponseEntity.ok(commentService.deleteComment(authUtils.getCurrentUserId(), commentId));
     }
 
     @GetMapping("/{commentId}")
@@ -40,6 +42,6 @@ public class RestCommentController {
 
     @PatchMapping("/update/{commentId}")
     public ResponseEntity<?> updateComment(@PathVariable String commentId, @RequestBody CommentDto commentDto) {
-        return ResponseEntity.ok().body(commentService.updateComment(commentId, commentDto));
+        return ResponseEntity.ok().body(commentService.updateComment(authUtils.getCurrentUserId(), commentId, commentDto));
     }
 }

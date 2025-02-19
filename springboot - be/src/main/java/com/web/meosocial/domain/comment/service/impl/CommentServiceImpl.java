@@ -9,6 +9,9 @@ import com.web.meosocial.domain.post.model.Post;
 import com.web.meosocial.domain.post.repository.PostRepository;
 import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.service.UserService;
+import com.web.meosocial.exception.UnauthorizedException;
+import com.web.meosocial.payload.ApiResponseDto;
+import com.web.meosocial.util.ApiResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,13 +31,15 @@ public class CommentServiceImpl implements CommentService {
     private CommentMediaService commentMediaService;
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private ApiResponseUtils apiResponseUtils;
 
     @Transactional
     @Override
-    public CommentDto createNewComment(CommentDto commentDto) {
+    public ApiResponseDto<CommentDto> createNewComment(Long userId, CommentDto commentDto) {
         Comment comment = new Comment();
         comment.setId(UUID.randomUUID().toString());
-        User user = userService.getUserById(commentDto.getUserId());
+        User user = userService.getUserById(userId);
         comment.setUser(user);
         Post post = getPostById(commentDto.getPostId());
         comment.setPost(post);
@@ -42,38 +47,45 @@ public class CommentServiceImpl implements CommentService {
         comment.setCreatedAt(LocalDateTime.now());
         comment.setIsDelete(false);
         commentRepository.save(comment);
-        return new CommentDto(comment);
+        return apiResponseUtils.success(new CommentDto(comment), "Create new comment successfully!");
     }
 
     @Override
-    public List<CommentDto> getAllCommentOfUser(Long userId) {
+    public ApiResponseDto<List<CommentDto>> getAllCommentOfUser(Long userId) {
         User user = userService.getUserById(userId);
         List<Comment> comments = commentRepository.findCommentsExistByUserId(user.getId());
         comments.forEach(comment ->
                 comment.setCommentmedia(comment.getCommentmedia().stream()
                         .filter(cm -> !cm.getIsDelete()).collect(Collectors.toList()))
         );
-        return comments.stream().map(CommentDto::new).collect(Collectors.toList());
+        return apiResponseUtils.success(comments.stream().map(CommentDto::new).collect(Collectors.toList()), "Get all comments successfully!");
     }
 
     @Override
-    public List<CommentDto> getCommentOfPost(String postId) {
+    public ApiResponseDto<List<CommentDto>> getCommentOfPost(String postId) {
         List<Comment> comments = commentRepository.findCommentsExistByPostId(postId);
         comments.forEach(comment ->
                 comment.setCommentmedia(comment.getCommentmedia().stream()
                         .filter(cm -> !cm.getIsDelete()).collect(Collectors.toList()))
         );
-        return comments.stream().map(CommentDto::new).collect(Collectors.toList());
+        return apiResponseUtils.success(comments.stream().map(CommentDto::new).collect(Collectors.toList()), "Get all comments of post successfully!");
     }
 
     @Transactional
     @Override
-    public void deleteComment(String commentId) {
+    public ApiResponseDto<Void> deleteComment(Long userId, String commentId) {
         Comment comment = getCommentById(commentId);
+        if(comment.getIsDelete()) {
+            throw new IllegalArgumentException("Comment is deleted");
+        }
+        if(!comment.getUser().getId().equals(userId)) {
+            throw new UnauthorizedException("You are not authorized to delete this comment");
+        }
         comment.setIsDelete(true);
         comment.setDeletedAt(LocalDateTime.now());
         commentMediaService.deleteCommentMediaOfComment(commentId);
         commentRepository.save(comment);
+        return apiResponseUtils.success(null, "Comment deleted successfully!");
     }
 
     @Transactional
@@ -89,21 +101,27 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDto getComment(String commentId) {
+    public ApiResponseDto<CommentDto> getComment(String commentId) {
         Comment comment = getCommentById(commentId);
         comment.setCommentmedia(comment.getCommentmedia().stream()
                 .filter(cm -> !cm.getIsDelete()).collect(Collectors.toList()));
-        return new CommentDto(comment);
+        return apiResponseUtils.success(new CommentDto(comment), "Get comment successfully!");
     }
 
     @Transactional
     @Override
-    public CommentDto updateComment(String commentId, CommentDto commentDto) {
+    public ApiResponseDto<CommentDto> updateComment(Long userId, String commentId, CommentDto commentDto) {
         Comment comment = getCommentById(commentId);
+        if(comment.getIsDelete()) {
+            throw new IllegalArgumentException("Comment is deleted");
+        }
+        if(!comment.getUser().getId().equals(userId)) {
+            throw new UnauthorizedException("You are not authorized to delete this comment");
+        }
         comment.setContent(commentDto.getContent());
         comment.setUpdatedAt(LocalDateTime.now());
         commentRepository.save(comment);
-        return new CommentDto(comment);
+        return apiResponseUtils.success(new CommentDto(comment), "Update comment successfully!");
     }
 
     private Comment getCommentById(String commentId) {
