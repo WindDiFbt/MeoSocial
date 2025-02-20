@@ -10,7 +10,7 @@ import com.web.meosocial.domain.post.repository.PostRepository;
 import com.web.meosocial.domain.post.service.PostMediaService;
 import com.web.meosocial.domain.validator.service.ValidationService;
 import com.web.meosocial.exception.UnauthorizedException;
-import com.web.meosocial.payload.ApiResponseDto;
+import com.web.meosocial.payload.response.ApiResponse;
 import com.web.meosocial.util.ApiResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,14 +37,14 @@ public class PostMediaServiceImpl implements PostMediaService {
     private ApiResponseUtils apiResponseUtils;
 
     @Override
-    public ApiResponseDto<List<PostMediaDto>> getPostMediaByPostId(String postId) {
+    public ApiResponse<List<PostMediaDto>> getPostMediaByPostId(String postId) {
         return apiResponseUtils.success(postMediaRepository.findAllByPostId(postId, false).stream()
                 .map(PostMediaDto::new).collect(Collectors.toList()), "Get All Post Media of Post Id " + postId + "successfully!");
     }
 
     @Transactional
     @Override
-    public ApiResponseDto<PostMediaDto> createPostMedia(Long userId, String postId, MultipartFile file) {
+    public ApiResponse<PostMediaDto> createPostMedia(Long userId, String postId, MultipartFile file) {
         PostMedia postMedia = new PostMedia();
         Post post = postRepository.findById(postId).orElse(null);
         if (post == null || post.getIsDelete()) {
@@ -84,7 +84,7 @@ public class PostMediaServiceImpl implements PostMediaService {
 
     @Transactional
     @Override
-    public ApiResponseDto<Void> deletePostMedia(Long userId, String postMediaId) {
+    public ApiResponse<Void> deletePostMedia(Long userId, String postMediaId) {
         PostMedia postMedia = postMediaRepository.findById(postMediaId).orElse(null);
         if (postMedia == null || postMedia.getIsDelete()) {
             throw new IllegalArgumentException("Post media not found");

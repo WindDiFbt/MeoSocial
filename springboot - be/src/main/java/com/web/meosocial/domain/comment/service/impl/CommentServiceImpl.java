@@ -10,7 +10,7 @@ import com.web.meosocial.domain.post.repository.PostRepository;
 import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.service.UserService;
 import com.web.meosocial.exception.UnauthorizedException;
-import com.web.meosocial.payload.ApiResponseDto;
+import com.web.meosocial.payload.response.ApiResponse;
 import com.web.meosocial.util.ApiResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public ApiResponseDto<CommentDto> createNewComment(Long userId, CommentDto commentDto) {
+    public ApiResponse<CommentDto> createNewComment(Long userId, CommentDto commentDto) {
         Comment comment = new Comment();
         comment.setId(UUID.randomUUID().toString());
         User user = userService.getUserById(userId);
@@ -51,7 +51,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public ApiResponseDto<List<CommentDto>> getAllCommentOfUser(Long userId) {
+    public ApiResponse<List<CommentDto>> getAllCommentOfUser(Long userId) {
         User user = userService.getUserById(userId);
         List<Comment> comments = commentRepository.findCommentsExistByUserId(user.getId());
         comments.forEach(comment ->
@@ -62,7 +62,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public ApiResponseDto<List<CommentDto>> getCommentOfPost(String postId) {
+    public ApiResponse<List<CommentDto>> getCommentOfPost(String postId) {
         List<Comment> comments = commentRepository.findCommentsExistByPostId(postId);
         comments.forEach(comment ->
                 comment.setCommentmedia(comment.getCommentmedia().stream()
@@ -73,7 +73,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public ApiResponseDto<Void> deleteComment(Long userId, String commentId) {
+    public ApiResponse<Void> deleteComment(Long userId, String commentId) {
         Comment comment = getCommentById(commentId);
         if(comment.getIsDelete()) {
             throw new IllegalArgumentException("Comment is deleted");
@@ -101,7 +101,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public ApiResponseDto<CommentDto> getComment(String commentId) {
+    public ApiResponse<CommentDto> getComment(String commentId) {
         Comment comment = getCommentById(commentId);
         comment.setCommentmedia(comment.getCommentmedia().stream()
                 .filter(cm -> !cm.getIsDelete()).collect(Collectors.toList()));
@@ -110,7 +110,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public ApiResponseDto<CommentDto> updateComment(Long userId, String commentId, CommentDto commentDto) {
+    public ApiResponse<CommentDto> updateComment(Long userId, String commentId, CommentDto commentDto) {
         Comment comment = getCommentById(commentId);
         if(comment.getIsDelete()) {
             throw new IllegalArgumentException("Comment is deleted");

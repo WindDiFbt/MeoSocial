@@ -2,9 +2,11 @@ package com.web.meosocial.auth;
 
 import com.web.meosocial.domain.user.model.UserDetailsImpl;
 import com.web.meosocial.exception.UnauthorizedException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 
 @Component
 public class AuthUtils {
@@ -33,4 +35,11 @@ public class AuthUtils {
             throw new UnauthorizedException("Unauthorized");
         }
     }
+
+    public String getDeviceId(HttpServletRequest request) {
+        String userAgent = request.getHeader("User-Agent");
+        String ipAddress = request.getRemoteAddr();
+        return DigestUtils.md5DigestAsHex((userAgent + ipAddress).getBytes()); // Hash thành ID duy nhất
+    }
+
 }

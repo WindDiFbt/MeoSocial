@@ -7,7 +7,7 @@ import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.repository.UserRepository;
 import com.web.meosocial.domain.user.service.UserService;
 import com.web.meosocial.domain.validator.service.ValidationService;
-import com.web.meosocial.payload.ApiResponseDto;
+import com.web.meosocial.payload.response.ApiResponse;
 import com.web.meosocial.util.ApiResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -29,13 +29,13 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
-    public ApiResponseDto<List<UserDto>> findAll() {
+    public ApiResponse<List<UserDto>> findAll() {
         return apiResponseUtils.success(userRepository.findAll().stream().map(UserDto::new).collect(Collectors.toList()), "Get all users success");
     }
 
     @Transactional
     @Override
-    public ApiResponseDto<UserDto> changePassword(Long userId, ChangePasswordDto changePasswordDto) {
+    public ApiResponse<UserDto> changePassword(Long userId, ChangePasswordDto changePasswordDto) {
         User user = getUserById(userId);
         if (passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword())) {
             validationService.getUserChangePasswordError(changePasswordDto);
@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public ApiResponseDto<UserDto> updateStatus(Long userId, Integer status) {
+    public ApiResponse<UserDto> updateStatus(Long userId, Integer status) {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
         user.setUserStatus(status);
         userRepository.save(user);

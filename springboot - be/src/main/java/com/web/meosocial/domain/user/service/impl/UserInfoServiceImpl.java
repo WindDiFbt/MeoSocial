@@ -10,7 +10,7 @@ import com.web.meosocial.domain.user.service.UserInfoService;
 import com.web.meosocial.domain.user.service.UserService;
 import com.web.meosocial.domain.validator.service.ValidationService;
 import com.web.meosocial.exception.UnauthorizedException;
-import com.web.meosocial.payload.ApiResponseDto;
+import com.web.meosocial.payload.response.ApiResponse;
 import com.web.meosocial.util.ApiResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     private ApiResponseUtils apiResponseUtils;
 
     @Override
-    public ApiResponseDto<UserInfoDto> getUserInfo(Long userId) {
+    public ApiResponse<UserInfoDto> getUserInfo(Long userId) {
         User user = userService.getUserById(userId);
         return apiResponseUtils.success(userInfoRepository.findById(user.getId()).stream().map(UserInfoDto::new)
                 .findFirst().orElseThrow(() -> new IllegalArgumentException("User not found!")), "Get user info success");
@@ -48,7 +48,7 @@ public class UserInfoServiceImpl implements UserInfoService {
      */
     @Transactional
     @Override
-    public ApiResponseDto<UserInfoDto> updateInformationUser(Long userId, UserInfoDto userInfoDto) {
+    public ApiResponse<UserInfoDto> updateInformationUser(Long userId, UserInfoDto userInfoDto) {
         if (!userInfoDto.getId().equals(userId)) {
             throw new UnauthorizedException("You do not have permission to update user info");
         }
@@ -78,7 +78,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Transactional
     @Override
-    public ApiResponseDto<Void> updateUserAvatar(Long userId, MultipartFile file) throws IOException {
+    public ApiResponse<Void> updateUserAvatar(Long userId, MultipartFile file) throws IOException {
         User user = userService.getUserById(userId);
         UserInfo userInfo = userInfoRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("User Not Found"));
         String imageUrl = cloudinaryService.getImageUrlAfterUpload(file, Enums.FolderCloudinary.Avatar.toString());

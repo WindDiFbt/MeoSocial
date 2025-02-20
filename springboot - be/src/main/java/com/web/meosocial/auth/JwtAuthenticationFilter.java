@@ -23,7 +23,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtUtils jwtUtils;
     @Autowired
     private RedisService redisService;
-
     @Autowired
     UserDetailsServiceImpl userDetailsService;
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
@@ -31,22 +30,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            String jwt = getToken(request);
-            if (jwt != null && jwtUtils.validateToken(jwt)) {
-                Long userId = jwtUtils.claimUserId(jwt);
-                String storedJwt = redisService.getToken(userId);
-                if (storedJwt != null && storedJwt.equals(jwt)) {
-                    UserDetails userDetails = userDetailsService.loadUserByUserId(userId);
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    userDetails.getAuthorities());
-                    authentication.setDetails(authentication);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                } else {
-                    logger.error("Invalid token or token not found in Redis.");
+            if (request.getRequestURI().matches("^/api/v1/auth/(login|register|refresh-token)$")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+            String accessToken = getToken(request);
+            if (accessToken != null && jwtUtils.validateAccessToken(accessToken)) {
+                if (redisService.isTokenBlacklisted(accessToken)) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                    return;
                 }
+                Long userId = jwtUtils.claimUserId(accessToken);
+                UserDetails userDetails = userDetailsService.loadUserByUserId(userId);
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities());
+                authentication.setDetails(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
             logger.error(e.getMessage());

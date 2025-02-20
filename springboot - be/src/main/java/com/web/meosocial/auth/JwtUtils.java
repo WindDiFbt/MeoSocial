@@ -35,7 +35,7 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_KEY));
     }
 
-    public String generateToken(Authentication authentication) {
+    public String generateAccessToken(Authentication authentication) {
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
         return Jwts.builder()
                 .setSubject(userPrincipal.getId().toString())
@@ -45,11 +45,20 @@ public class JwtUtils {
                 .compact();
     }
 
-    public Long claimUserId(String token) {
-        return Long.parseLong(Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(token).getBody().getSubject());
+    public String generateAccessToken(Long userId) {
+        return Jwts.builder()
+                .setSubject(userId.toString())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(key())
+                .compact();
     }
 
-    public boolean validateToken(String token) {
+    public Long claimUserId(String accessToken) {
+        return Long.parseLong(Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(accessToken).getBody().getSubject());
+    }
+
+    public boolean validateAccessToken(String token) {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key())
@@ -69,4 +78,13 @@ public class JwtUtils {
         return false;
     }
 
+    public long getExpiration(String accessToken) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody();
+        Date expiration = claims.getExpiration();
+        return (expiration.getTime() - System.currentTimeMillis()) / 1000;
+    }
 }

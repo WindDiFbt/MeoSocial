@@ -1,6 +1,6 @@
 package com.web.meosocial.domain.validator.service;
 
-import com.web.meosocial.payload.RegisterRequestDto;
+import com.web.meosocial.payload.request.RegisterRequest;
 import com.web.meosocial.domain.user.dto.ChangePasswordDto;
 import com.web.meosocial.domain.user.dto.UserInfoDto;
 import org.springframework.stereotype.Service;
@@ -10,7 +10,7 @@ import java.io.IOException;
 
 @Service
 public interface ValidationService {
-    void getUserRegisterError(RegisterRequestDto registerRequestDto);
+    void getUserRegisterError(RegisterRequest registerRequest);
 
     void getUserInfoUpdateError(UserInfoDto userInfoDto);
 

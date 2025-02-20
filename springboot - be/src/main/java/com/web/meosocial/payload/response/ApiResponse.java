@@ -1,4 +1,4 @@
-package com.web.meosocial.payload;
+package com.web.meosocial.payload.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ApiResponseDto<T> {
+public class ApiResponse<T> {
     private String status;
     private List<String> message;
     private T response;

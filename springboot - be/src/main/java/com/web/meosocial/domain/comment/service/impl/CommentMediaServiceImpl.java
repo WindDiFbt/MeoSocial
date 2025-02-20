@@ -10,7 +10,7 @@ import com.web.meosocial.domain.comment.repository.CommentRepository;
 import com.web.meosocial.domain.comment.service.CommentMediaService;
 import com.web.meosocial.domain.validator.service.ValidationService;
 import com.web.meosocial.exception.UnauthorizedException;
-import com.web.meosocial.payload.ApiResponseDto;
+import com.web.meosocial.payload.response.ApiResponse;
 import com.web.meosocial.util.ApiResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,7 +38,7 @@ public class CommentMediaServiceImpl implements CommentMediaService {
 
     @Transactional
     @Override
-    public ApiResponseDto<CommentMediaDto> createCommentMedia(Long userId, String commentId, MultipartFile file) {
+    public ApiResponse<CommentMediaDto> createCommentMedia(Long userId, String commentId, MultipartFile file) {
         CommentMedia commentMedia = new CommentMedia();
         Comment comment = commentRepository.findById(commentId).orElse(null);
         if (comment == null || comment.getIsDelete()) {
@@ -72,7 +72,7 @@ public class CommentMediaServiceImpl implements CommentMediaService {
 
     @Transactional
     @Override
-    public ApiResponseDto<Void> deleteCommentMedia(Long userId, String commentMediaId) {
+    public ApiResponse<Void> deleteCommentMedia(Long userId, String commentMediaId) {
         CommentMedia commentMedia = commentMediaRepository.findById(commentMediaId).orElse(null);
         if (commentMedia == null || commentMedia.getIsDelete()) {
             throw new IllegalArgumentException("Comment not found or deleted: " + commentMediaId);
@@ -97,7 +97,7 @@ public class CommentMediaServiceImpl implements CommentMediaService {
     }
 
     @Override
-    public ApiResponseDto<List<CommentMediaDto>> getAllCommentMediaByCommentId(String commentId) {
+    public ApiResponse<List<CommentMediaDto>> getAllCommentMediaByCommentId(String commentId) {
         return apiResponseUtils.success(commentMediaRepository.findAllByCommentId(commentId).stream()
                 .map(CommentMediaDto::new).collect(Collectors.toList()), "Get all comment media successfully");
     }

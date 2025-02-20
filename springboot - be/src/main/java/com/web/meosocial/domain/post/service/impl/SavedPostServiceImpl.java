@@ -9,7 +9,7 @@ import com.web.meosocial.domain.post.service.SavedPostService;
 import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.service.UserService;
 import com.web.meosocial.exception.UnauthorizedException;
-import com.web.meosocial.payload.ApiResponseDto;
+import com.web.meosocial.payload.response.ApiResponse;
 import com.web.meosocial.util.ApiResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,7 +38,7 @@ public class SavedPostServiceImpl implements SavedPostService {
      * @return {@code ApiResponseDto<List<SavedPostDto>>} A response containing a list of saved posts.
      */
     @Override
-    public ApiResponseDto<List<SavedPostDto>> getAllPostsSaved(Long userId) {
+    public ApiResponse<List<SavedPostDto>> getAllPostsSaved(Long userId) {
         List<SavedPostDto> list = savedPostRepository.findByUserId(userId)
                 .stream()
                 .map(SavedPostDto::new)
@@ -56,7 +56,7 @@ public class SavedPostServiceImpl implements SavedPostService {
      */
     @Transactional
     @Override
-    public ApiResponseDto<SavedPostDto> savePost(Long userId, String postId) {
+    public ApiResponse<SavedPostDto> savePost(Long userId, String postId) {
         SavedPost savedPost = savedPostRepository.findByUserIdAndPostId(userId, postId);
         if (savedPost != null) {
             // If the post was deleted, restore it
@@ -79,7 +79,7 @@ public class SavedPostServiceImpl implements SavedPostService {
         newSavePost.setSavedAt(LocalDateTime.now());
         newSavePost.setIsDelete(false);
         savedPostRepository.save(newSavePost);
-        return ApiResponseDto.<SavedPostDto>builder()
+        return ApiResponse.<SavedPostDto>builder()
                 .status(String.valueOf(HttpStatus.OK))
                 .message(List.of("Saved post successfully!"))
                 .response(new SavedPostDto(newSavePost))
@@ -97,7 +97,7 @@ public class SavedPostServiceImpl implements SavedPostService {
      */
     @Transactional
     @Override
-    public ApiResponseDto<Void> deleteSavedPost(Long userId, String savedPostId) {
+    public ApiResponse<Void> deleteSavedPost(Long userId, String savedPostId) {
         SavedPost savedPost = savedPostRepository.findById(savedPostId).orElseThrow(() -> new IllegalArgumentException("Saved Post not found"));
         if (!savedPost.getUser().getId().equals(userId)) {
             throw new UnauthorizedException("User is not authorized to remove this post");

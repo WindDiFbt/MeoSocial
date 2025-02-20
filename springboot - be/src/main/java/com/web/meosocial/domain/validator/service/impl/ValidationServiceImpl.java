@@ -1,6 +1,6 @@
 package com.web.meosocial.domain.validator.service.impl;
 
-import com.web.meosocial.payload.RegisterRequestDto;
+import com.web.meosocial.payload.request.RegisterRequest;
 import com.web.meosocial.domain.user.dto.ChangePasswordDto;
 import com.web.meosocial.domain.user.dto.UserInfoDto;
 import com.web.meosocial.domain.validator.service.ValidationService;
@@ -15,10 +15,10 @@ import java.util.List;
 @Service
 public class ValidationServiceImpl implements ValidationService {
     @Override
-    public void getUserRegisterError(RegisterRequestDto registerRequestDto) {
+    public void getUserRegisterError(RegisterRequest registerRequest) {
         List<String> errorMessages = new ArrayList<>();
-        errorMessages.add(ValidationUtils.validateUsername(registerRequestDto.getUserName()));
-        errorMessages.add(ValidationUtils.validatePassword(registerRequestDto.getPassword()));
+        errorMessages.add(ValidationUtils.validateUsername(registerRequest.getUserName()));
+        errorMessages.add(ValidationUtils.validatePassword(registerRequest.getPassword()));
         throwError(errorMessages);
     }
 
