@@ -18,4 +18,6 @@ public interface UserRelationshipService {
     Boolean IsUserRelaMutualFollow(Long followerId, Long followingId);
 
     Boolean IsUserFollow(Long followerId, Long followingId);
+
+    Boolean IsUserBlocked(Long followerId, Long followingId);
 }

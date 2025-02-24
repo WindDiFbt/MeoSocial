@@ -8,9 +8,19 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, String> {
-    @Query("SELECT c FROM Comment c WHERE c.user.id = :userId AND c.isDelete = FALSE")
-    List<Comment> findCommentsExistByUserId(@Param("userId") Long userId);
+    @Query("SELECT c FROM Comment c WHERE c.user.id = :userId ORDER BY c.createdAt ASC")
+    List<Comment> findCommentsExistByUserIdOrderByCreatedAtAsc(@Param("userId") Long userId);
 
-    @Query("SELECT c FROM Comment c WHERE c.post.id = :postId AND c.isDelete = FALSE")
-    List<Comment> findCommentsExistByPostId(@Param("postId") String postId);
+    @Query("SELECT c FROM Comment c WHERE c.post.id = :postId ORDER BY c.createdAt ASC")
+    List<Comment> findParentsCommentsExistByPostIdOrderByCreatedAtAsc(@Param("postId") String postId);
+
+    @Query("SELECT c FROM Comment c WHERE c.parentCommentId = :parentCommentId ORDER BY c.createdAt ASC")
+    List<Comment> findChildrenCommentsExistByParentCommentIdOrderByCreatedAtAsc(@Param("parentCommentId") String parentCommentId);
+
+    @Query("SELECT c FROM Comment c WHERE c.post.id = :postId")
+    List<Comment> findAllCommentsExistByPostId(@Param("postId") String postId);
+
+    @Query("SELECT COUNT(c) > 0 FROM Comment c  WHERE c.id = :commentId AND c.post.id = :postId")
+    boolean existsByCommentIdAndPostId(@Param("commentId") String commentId, @Param("postId") String postId);
+
 }

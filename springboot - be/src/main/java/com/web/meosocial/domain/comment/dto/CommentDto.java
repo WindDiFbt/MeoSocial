@@ -1,15 +1,18 @@
 package com.web.meosocial.domain.comment.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.web.meosocial.domain.comment.model.Comment;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CommentDto {
     private String id;
     private Long userId;
@@ -18,10 +21,11 @@ public class CommentDto {
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Long parentCommentId;
+    private String parentCommentId;
     private LocalDateTime deletedAt;
 
     private List<CommentMediaDto> media;
+    private List<CommentDto> replies;
 
     // Constructor to map from Comment entity to CommentDto
     public CommentDto(Comment comment) {
@@ -38,6 +42,7 @@ public class CommentDto {
             if (comment.getCommentmedia() != null) {
                 this.media = comment.getCommentmedia().stream().map(CommentMediaDto::new).collect(Collectors.toList());
             }
+            this.replies = new ArrayList<>();
         }
     }
 }

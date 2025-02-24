@@ -5,34 +5,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class RedisServiceImpl implements RedisService {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
-    private static final String TOKEN_PREFIX = "auth:token:";
-
     @Override
-    public void saveToken(Long userId, String token, Long expiration) {
-        String key = TOKEN_PREFIX + userId;
-        stringRedisTemplate.opsForValue().set(key, token, Duration.ofSeconds(expiration));
+    public void blacklistToken(String accessToken, long expirationTimeInSeconds) {
+        stringRedisTemplate.opsForValue().set(accessToken, "blacklisted", expirationTimeInSeconds, TimeUnit.SECONDS);
     }
 
     @Override
-    public String getToken(Long userId) {
-        return stringRedisTemplate.opsForValue().get(TOKEN_PREFIX + userId);
-    }
-
-    @Override
-    public void deleteToken(Long userId) {
-        stringRedisTemplate.delete(TOKEN_PREFIX + userId);
-    }
-
-    @Override
-    public boolean checkToken(Long userId, String token) {
-        String storedToken = getToken(userId);
-        return storedToken != null && storedToken.equals(token);
+    public boolean isTokenBlacklisted(String accessToken) {
+        return Boolean.TRUE.equals(stringRedisTemplate.hasKey(accessToken));
     }
 }

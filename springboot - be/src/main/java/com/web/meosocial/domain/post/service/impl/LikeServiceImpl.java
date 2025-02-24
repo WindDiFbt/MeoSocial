@@ -8,7 +8,7 @@ import com.web.meosocial.domain.post.service.LikeService;
 import com.web.meosocial.domain.post.service.PostService;
 import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.service.UserService;
-import com.web.meosocial.payload.ApiResponseDto;
+import com.web.meosocial.payload.response.ApiResponse;
 import com.web.meosocial.util.ApiResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class LikeServiceImpl implements LikeService {
 
     @Transactional
     @Override
-    public ApiResponseDto<LikePostDto> likePost(Long userId, String postId) {
+    public ApiResponse<LikePostDto> likePost(Long userId, String postId) {
         Post post = postService.getPostById(postId);
         if (post.getIsDelete()) {
             throw new IllegalArgumentException("Post is deleted!");
@@ -58,7 +58,7 @@ public class LikeServiceImpl implements LikeService {
 
     @Transactional
     @Override
-    public ApiResponseDto<LikePostDto> unlikePost(Long userId, String postId) {
+    public ApiResponse<LikePostDto> unlikePost(Long userId, String postId) {
         Post post = postService.getPostById(postId);
         if (post.getIsDelete()) {
             throw new IllegalArgumentException("Post is deleted!");

@@ -2,17 +2,20 @@ package com.web.meosocial.auth.service;
 
 import com.web.meosocial.exception.RoleNotFoundException;
 import com.web.meosocial.exception.UserAlreadyExistsException;
-import com.web.meosocial.payload.ApiResponseDto;
-import com.web.meosocial.payload.LoginRequestDto;
-import com.web.meosocial.payload.RegisterRequestDto;
+import com.web.meosocial.payload.response.ApiResponse;
+import com.web.meosocial.payload.request.LoginRequest;
+import com.web.meosocial.payload.request.RegisterRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
 public interface AuthService {
-    ResponseEntity<ApiResponseDto<?>> login(LoginRequestDto request);
+    ResponseEntity<ApiResponse<?>> login(LoginRequest loginRequest, HttpServletRequest request);
 
-    ResponseEntity<ApiResponseDto<?>> register(RegisterRequestDto request) throws RoleNotFoundException, UserAlreadyExistsException;
+    ResponseEntity<ApiResponse<?>> register(RegisterRequest request) throws RoleNotFoundException, UserAlreadyExistsException;
 
-    ResponseEntity<ApiResponseDto<?>> logout(Long userId);
+    ResponseEntity<ApiResponse<?>> logout(HttpServletRequest request);
+
+    ResponseEntity<ApiResponse<?>> refreshToken(String refreshToken);
 }

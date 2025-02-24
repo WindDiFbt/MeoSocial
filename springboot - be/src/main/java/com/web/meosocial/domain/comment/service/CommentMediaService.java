@@ -1,7 +1,7 @@
 package com.web.meosocial.domain.comment.service;
 
 import com.web.meosocial.domain.comment.dto.CommentMediaDto;
-import com.web.meosocial.payload.ApiResponseDto;
+import com.web.meosocial.payload.response.ApiResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,11 +9,11 @@ import java.util.List;
 
 @Service
 public interface CommentMediaService {
-    ApiResponseDto<CommentMediaDto> createCommentMedia(Long userId, String commentId, MultipartFile file);
+    ApiResponse<CommentMediaDto> createCommentMedia(Long userId, String commentId, MultipartFile file);
 
-    ApiResponseDto<Void> deleteCommentMedia(Long userId, String commentMediaId);
+    ApiResponse<Void> deleteCommentMedia(Long userId, String commentMediaId);
 
     void deleteCommentMediaOfComment(String commentId);
 
-    ApiResponseDto<List<CommentMediaDto>> getAllCommentMediaByCommentId(String commentId);
+    ApiResponse<List<CommentMediaDto>> getAllCommentMediaByCommentId(String commentId);
 }

@@ -13,7 +13,7 @@ import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.service.UserRelationshipService;
 import com.web.meosocial.domain.user.service.UserService;
 import com.web.meosocial.exception.UnauthorizedException;
-import com.web.meosocial.payload.ApiResponseDto;
+import com.web.meosocial.payload.response.ApiResponse;
 import com.web.meosocial.util.ApiResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,7 +48,7 @@ public class PostServiceImpl implements PostService {
      */
     @Transactional
     @Override
-    public ApiResponseDto<PostDto> createNewPost(Long userId, PostDto postDto) {
+    public ApiResponse<PostDto> createNewPost(Long userId, PostDto postDto) {
         Post post = new Post();
         post.setId(UUID.randomUUID().toString());
         User user = userService.getUserById(userId);
@@ -81,7 +81,7 @@ public class PostServiceImpl implements PostService {
      * @return ApiResponseDto&lt;List&lt;PostDto&gt;> A response containing a list of the user's posts.
      */
     @Override
-    public ApiResponseDto<List<PostDto>> getAllPostsOfUser(Long userId) {
+    public ApiResponse<List<PostDto>> getAllPostsOfUser(Long userId) {
         User user = userService.getUserById(userId);
         List<Post> posts = postRepository.findAllByUserId(user.getId());
         for (Post post : posts) {
@@ -101,7 +101,7 @@ public class PostServiceImpl implements PostService {
      */
     @Transactional
     @Override
-    public ApiResponseDto<Void> deletePost(Long userId, String postId) {
+    public ApiResponse<Void> deletePost(Long userId, String postId) {
         Post post = getPostById(postId);
         List<Post> sharedPosts = postRepository.findAllBySharedPostId(post.getId());
         if (!post.getUser().getId().equals(userId)) {
@@ -125,7 +125,7 @@ public class PostServiceImpl implements PostService {
      * @return ApiResponseDto&lt;PostDto&gt; containing the requested post.
      */
     @Override
-    public ApiResponseDto<PostDto> getPost( String postId) {
+    public ApiResponse<PostDto> getPost(String postId) {
         Post post = getPostById(postId);
         post.setPostmedia(post.getPostmedia().stream()
                 .filter(pm -> !pm.getIsDelete()).collect(Collectors.toList()));
@@ -142,7 +142,7 @@ public class PostServiceImpl implements PostService {
      */
     @Transactional
     @Override
-    public ApiResponseDto<PostDto> changeVisibilityLevel(Long userId, ChangeVisibilityDto changeVisibilityDto) {
+    public ApiResponse<PostDto> changeVisibilityLevel(Long userId, ChangeVisibilityDto changeVisibilityDto) {
         Post post = getPostById(changeVisibilityDto.getPostId());
         if (!post.getUser().getId().equals(userId)) {
             throw new UnauthorizedException("User is not authorized to continue action!");
@@ -185,7 +185,7 @@ public class PostServiceImpl implements PostService {
      */
     @Transactional
     @Override
-    public ApiResponseDto<PostDto> updatePost(Long userId, String postId, PostDto postDto) {
+    public ApiResponse<PostDto> updatePost(Long userId, String postId, PostDto postDto) {
         Post post = getPostById(postId);
         if (!post.getUser().getId().equals(userId)) {
             throw new UnauthorizedException("User is not authorized to continue action!");
@@ -214,7 +214,7 @@ public class PostServiceImpl implements PostService {
      */
     @Transactional
     @Override
-    public ApiResponseDto<PostDto> sharePost(Long userId, SharedPostDto sharedPostDto) {
+    public ApiResponse<PostDto> sharePost(Long userId, SharedPostDto sharedPostDto) {
         Post post = getPostById(sharedPostDto.getSharedPostId());
         if (!post.getUser().getId().equals(userId)) {
             throw new UnauthorizedException("User is not authorized to continue action!");

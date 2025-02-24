@@ -27,7 +27,7 @@ public class RestCommentController {
 
     @GetMapping("/post/{postId}")
     public ResponseEntity<?> getCommentOfPost(@PathVariable String postId) {
-        return ResponseEntity.ok().body(commentService.getCommentOfPost(postId));
+        return ResponseEntity.ok().body(commentService.getCommentOfPost(authUtils.getCurrentUserId(), postId));
     }
 
     @PatchMapping("/delete/{commentId}")

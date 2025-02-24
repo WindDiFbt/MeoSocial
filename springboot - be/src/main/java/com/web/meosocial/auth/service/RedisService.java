@@ -4,11 +4,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface RedisService {
-    void saveToken(Long userId, String token, Long expiration);
+    void blacklistToken(String accessToken, long expirationTimeInSeconds);
 
-    String getToken(Long userId);
-
-    void deleteToken(Long userId);
-
-    boolean checkToken(Long userId, String token);
+    boolean isTokenBlacklisted(String accessToken);
 }
