@@ -5,7 +5,6 @@ import com.web.meosocial.domain.user.dto.UserRelationshipDto;
 import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.model.UserRelationship;
 import com.web.meosocial.domain.user.repository.UserRelationshipRepository;
-import com.web.meosocial.domain.user.repository.UserRepository;
 import com.web.meosocial.domain.user.service.UserRelationshipService;
 import com.web.meosocial.domain.user.service.UserService;
 import com.web.meosocial.util.UUID64Generator;
@@ -264,12 +263,31 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
     }
 
     @Override
-    public Boolean IsUserRelaMutualFollow(Long followerId, Long followingId) {
-        return userRelaRepository.getUserRelationship(followerId, followingId).getHasMutualFollow();
+    public Boolean IsUserFollow(Long followerId, Long followingId) {
+        if (followerId == null || followingId == null) {
+            throw new IllegalArgumentException("Follower and Following cannot be null.");
+        }
+        UserRelationship relationship = userRelaRepository.getUserRelationship(followerId, followingId);
+        return relationship != null && relationship.getStatus().equals(Enums.RelationshipStatus.FOLLOW.getValue());
     }
 
     @Override
-    public Boolean IsUserFollow(Long followerId, Long followingId) {
-        return userRelaRepository.getUserRelationship(followerId, followingId).getStatus().equals(Enums.RelationshipStatus.FOLLOW.getValue());
+    public Boolean IsUserRelaMutualFollow(Long followerId, Long followingId) {
+        if (followerId == null || followingId == null) {
+            throw new IllegalArgumentException("Follower and Following cannot be null.");
+        }
+        UserRelationship relationship = userRelaRepository.getUserRelationship(followerId, followingId);
+        return relationship != null && relationship.getHasMutualFollow();
     }
+
+
+    @Override
+    public Boolean IsUserBlocked(Long followerId, Long followingId) {
+        if (followerId == null || followingId == null) {
+            throw new IllegalArgumentException("Follower and Following cannot be null.");
+        }
+        UserRelationship relationship = userRelaRepository.getUserRelationship(followerId, followingId);
+        return relationship != null && relationship.getStatus().equals(Enums.RelationshipStatus.BLOCKED.getValue());
+    }
+
 }

@@ -12,7 +12,7 @@ public interface CommentService {
 
     ApiResponse<List<CommentDto>> getAllCommentOfUser(Long userId);
 
-    ApiResponse<List<CommentDto>> getCommentOfPost(String postId);
+    ApiResponse<List<CommentDto>> getCommentOfPost(Long userId, String postId);
 
     ApiResponse<Void> deleteComment(Long userId, String commentId);
 

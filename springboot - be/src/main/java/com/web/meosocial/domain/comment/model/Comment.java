@@ -41,7 +41,7 @@ public class Comment {
     private LocalDateTime updatedAt;
 
     @Column(name = "parent_comment_id")
-    private Long parentCommentId;
+    private String parentCommentId;
 
     @OneToMany(mappedBy = "comment")
     private List<CommentMedia> commentmedia;

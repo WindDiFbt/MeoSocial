@@ -81,4 +81,16 @@ public class GlobalExceptionHandler {
                                 .build()
                 );
     }
+
+    @ExceptionHandler(value = NullPointerException.class)
+    public ResponseEntity<ApiResponse<?>> NullPointerExceptionHandler(HttpRequestMethodNotSupportedException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ApiResponse.builder()
+                                .status(String.valueOf(HttpStatus.BAD_REQUEST))
+                                .message(List.of(exception.getMessage()))
+                                .build()
+                );
+    }
 }
