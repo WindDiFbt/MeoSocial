@@ -9,8 +9,8 @@ import com.web.meosocial.domain.comment.service.CommentService;
 import com.web.meosocial.domain.post.model.Post;
 import com.web.meosocial.domain.post.repository.PostRepository;
 import com.web.meosocial.domain.user.model.User;
-import com.web.meosocial.domain.user.service.UserRelationshipService;
 import com.web.meosocial.domain.user.service.UserService;
+import com.web.meosocial.domain.validator.service.ValidationService;
 import com.web.meosocial.exception.UnauthorizedException;
 import com.web.meosocial.payload.response.ApiResponse;
 import com.web.meosocial.util.ApiResponseUtils;
@@ -35,13 +35,13 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     private ApiResponseUtils apiResponseUtils;
     @Autowired
-    private UserRelationshipService userRelationshipService;
+    private ValidationService validationService;
 
     /**
      * Service method to create a new comment on a post.
      *
-     * @param userId      The ID of the user creating the comment.
-     * @param commentDto  The DTO containing comment details.
+     * @param userId     The ID of the user creating the comment.
+     * @param commentDto The DTO containing comment details.
      * @return ApiResponse containing the created CommentDto.
      * @throws IllegalArgumentException if the user does not have permission to comment or
      *                                  if the parent comment does not exist in the post.
@@ -49,12 +49,15 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public ApiResponse<CommentDto> createNewComment(Long userId, CommentDto commentDto) {
+        if (commentDto.getContent().isBlank()) {
+            throw new IllegalArgumentException("Please enter content of the comment!");
+        }
         Comment comment = new Comment();
         comment.setId(UUID.randomUUID().toString());
         User user = userService.getUserById(userId);
         Post post = getPostById(commentDto.getPostId());
         // Check permission to comment on the post
-        if (hasNotPermissionToAction(user, post, Enums.VisibilityLevel.fromValue(post.getVisibilityLevel()))) {
+        if (validationService.hasNotPermissionToAction(user, post, Enums.VisibilityLevel.fromValue(post.getVisibilityLevel()))) {
             throw new IllegalArgumentException("You do not have permission to comment on this post!");
         }
         comment.setUser(user);
@@ -102,7 +105,7 @@ public class CommentServiceImpl implements CommentService {
         User user = userService.getUserById(userId);
         Post post = getPostById(postId);
         // Check if the user has permission to view the comments on this post
-        if (hasNotPermissionToAction(user, post, Enums.VisibilityLevel.fromValue(post.getVisibilityLevel()))) {
+        if (validationService.hasNotPermissionToAction(user, post, Enums.VisibilityLevel.fromValue(post.getVisibilityLevel()))) {
             throw new IllegalArgumentException("You do not have permission to comment on this post!");
         }
         List<Comment> allComments = commentRepository.findParentsCommentsExistByPostIdOrderByCreatedAtAsc(postId);
@@ -171,6 +174,9 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public ApiResponse<CommentDto> updateComment(Long userId, String commentId, CommentDto commentDto) {
+        if (commentDto.getContent().isBlank()) {
+            throw new IllegalArgumentException("Please enter content of the comment!");
+        }
         Comment comment = getCommentById(commentId);
         if (comment.getIsDelete()) {
             throw new IllegalArgumentException("Comment is deleted");
@@ -198,33 +204,5 @@ public class CommentServiceImpl implements CommentService {
             throw new IllegalArgumentException("Post Not Found or deleted: " + postId);
         }
         return post;
-    }
-
-    /**
-     * Checks if a user has permission to interact with a post based on its visibility level.
-     * <p>
-     * This method determines whether the user can perform actions (such as commenting) on a given post.
-     * It considers factors like whether the user is blocked, the post's visibility level, and the user's
-     * relationship with the post's owner.
-     *
-     * @param user The user attempting to interact with the post.
-     * @param post The post being accessed.
-     * @param visibilityLevel The visibility setting of the post.
-     * @return true if the user does NOT have permission to interact with the post, false otherwise.
-     */
-    private boolean hasNotPermissionToAction(User user, Post post, Enums.VisibilityLevel visibilityLevel) {
-        if (userRelationshipService.IsUserBlocked(user.getId(), post.getUser().getId()) || userRelationshipService.IsUserBlocked(post.getUser().getId(), user.getId())) {
-            return true;
-        }
-        boolean hasAccess = switch (visibilityLevel) {
-            case PUBLIC -> true;
-            case FRIENDS ->
-                    userRelationshipService.IsUserRelaMutualFollow(user.getId(), post.getUser().getId()) || user.getId().equals(post.getUser().getId());
-            case PRIVATE -> user.getId().equals(post.getUser().getId());
-            case FOLLOWER ->
-                    userRelationshipService.IsUserFollow(user.getId(), post.getUser().getId()) || user.getId().equals(post.getUser().getId());
-            default -> false;
-        };
-        return !hasAccess;
     }
 }

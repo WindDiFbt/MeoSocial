@@ -5,13 +5,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface UserRelationshipService {
-    UserRelationshipDto followUser(UserRelationshipDto userRelationshipDto);
+    UserRelationshipDto followUser(Long followerId, UserRelationshipDto userRelationshipDto);
 
-    UserRelationshipDto unfollowUser(UserRelationshipDto userRelationshipDto);
+    UserRelationshipDto unfollowUser(Long followerId, UserRelationshipDto userRelationshipDto);
 
-    UserRelationshipDto blockUser(UserRelationshipDto userRelationshipDto);
+    UserRelationshipDto blockUser(Long followerId, UserRelationshipDto userRelationshipDto);
 
-    UserRelationshipDto unblockUser(UserRelationshipDto userRelationshipDto);
+    UserRelationshipDto unblockUser(Long followerId, UserRelationshipDto userRelationshipDto);
 
     UserRelationshipDto getUserRelationshipById(Long id);
 
