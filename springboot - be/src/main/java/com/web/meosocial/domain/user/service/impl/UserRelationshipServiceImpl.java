@@ -1,6 +1,7 @@
 package com.web.meosocial.domain.user.service.impl;
 
 import com.web.meosocial.constant.Enums;
+import com.web.meosocial.domain.notification.service.NotificationService;
 import com.web.meosocial.domain.user.dto.UserRelationshipDto;
 import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.model.UserRelationship;
@@ -22,6 +23,8 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
     private UserRelationshipRepository userRelaRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private NotificationService notificationService;
     private final UUID64Generator uuid64Generator = new UUID64Generator();
     private static final Logger LOGGER = LoggerFactory.getLogger(UserRelationshipServiceImpl.class);
 
@@ -241,6 +244,12 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
         relationship.setHasMutualFollow(hasMutualFollow);
         relationship.setCreatedAt(LocalDateTime.now());
         userRelaRepository.save(relationship);
+        notificationService.createU2UNotification(
+                following.getId(),
+                follower.getId(),
+                Enums.NotificationType.NEW_FOLLOWER.getValue(),
+                "User " + follower.getUserName() + " is following you!"
+        );
         LOGGER.info("Creating new relationship: followerId - {}, followingId - {}, status - {}, hasMutualFollow - {}",
                 follower.getId(), following.getId(), status, hasMutualFollow);
         return new UserRelationshipDto(relationship);
@@ -257,6 +266,14 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
         userRelationshipExisted.setStatus(status);
         userRelationshipExisted.setHasMutualFollow(hasMutualFollow);
         userRelationshipExisted.setUpdatedAt(LocalDateTime.now());
+        if (status.equals(Enums.RelationshipStatus.FOLLOW.getValue())) {
+            notificationService.createU2UNotification(
+                    userRelationshipExisted.getFollowing(),
+                    userRelationshipExisted.getFollower().getId(),
+                    Enums.NotificationType.NEW_FOLLOWER.getValue(),
+                    "User " + userRelationshipExisted.getFollower().getUserName() + " is following you!"
+            );
+        }
         LOGGER.info("Updating relationship: relationshipId - {}, status - {}, hasMutualFollow - {}",
                 userRelationshipExisted.getId(), status, hasMutualFollow);
         userRelaRepository.save(userRelationshipExisted);

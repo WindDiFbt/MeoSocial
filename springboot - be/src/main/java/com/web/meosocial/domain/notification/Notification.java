@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class Notification {
     @Id
     @Column(name = "id", nullable = false)
-    private Long id;
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipient_id")
@@ -23,14 +23,9 @@ public class Notification {
     @Column(name = "sender_id")
     private Long senderId;
 
-    @Lob
     @Column(name = "type")
     private Integer type;
 
-    @Column(name = "reference_id")
-    private Long referenceId;
-
-    @Lob
     @Column(name = "reference_type")
     private Integer referenceType;
 
@@ -49,7 +44,6 @@ public class Notification {
             this.id = notificationDto.getId();
             this.senderId = notificationDto.getSenderId();
             this.type = notificationDto.getType();
-            this.referenceId = notificationDto.getReferenceId();
             this.referenceType = notificationDto.getReferenceType();
             this.content = notificationDto.getContent();
             this.isRead = notificationDto.getIsRead();

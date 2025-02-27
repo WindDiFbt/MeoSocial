@@ -1,6 +1,7 @@
 package com.web.meosocial.domain.post.service.impl;
 
 import com.web.meosocial.constant.Enums;
+import com.web.meosocial.domain.notification.service.NotificationService;
 import com.web.meosocial.domain.post.dto.LikePostDto;
 import com.web.meosocial.domain.post.model.Like;
 import com.web.meosocial.domain.post.model.Post;
@@ -31,6 +32,8 @@ public class LikeServiceImpl implements LikeService {
     private ApiResponseUtils apiResponseUtils;
     @Autowired
     private ValidationService validationService;
+    @Autowired
+    private NotificationService notificationService;
 
     /**
      * Likes a post on behalf of a user. If the user has already liked the post,
@@ -68,6 +71,12 @@ public class LikeServiceImpl implements LikeService {
         like.setCreatedAt(LocalDateTime.now());
         like.setIsDeleted(false);
         likeRepository.save(like);
+        notificationService.createU2UNotification(
+                post.getUser().getId(),
+                userId,
+                Enums.NotificationType.LIKE_POST.getValue(),
+                "User " + user.getUserName() + " liked this post!"
+        );
         return apiResponseUtils.success(new LikePostDto(like), "Like Successfully!");
     }
 

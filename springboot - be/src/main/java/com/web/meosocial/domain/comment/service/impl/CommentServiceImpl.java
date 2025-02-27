@@ -6,6 +6,7 @@ import com.web.meosocial.domain.comment.model.Comment;
 import com.web.meosocial.domain.comment.repository.CommentRepository;
 import com.web.meosocial.domain.comment.service.CommentMediaService;
 import com.web.meosocial.domain.comment.service.CommentService;
+import com.web.meosocial.domain.notification.service.NotificationService;
 import com.web.meosocial.domain.post.model.Post;
 import com.web.meosocial.domain.post.repository.PostRepository;
 import com.web.meosocial.domain.user.model.User;
@@ -36,6 +37,8 @@ public class CommentServiceImpl implements CommentService {
     private ApiResponseUtils apiResponseUtils;
     @Autowired
     private ValidationService validationService;
+    @Autowired
+    private NotificationService notificationService;
 
     /**
      * Service method to create a new comment on a post.
@@ -77,13 +80,28 @@ public class CommentServiceImpl implements CommentService {
             comment.setParentCommentId(parentComment.getId());
         }
         commentRepository.save(comment);
+        if (commentDto.getParentCommentId() == null) {
+            notificationService.createU2UNotification(
+                    post.getUser().getId(),
+                    userId,
+                    Enums.NotificationType.COMMENT_ON_POST.getValue(),
+                    "User " + user.getUserName() + " has commented on your post."
+            );
+        } else {
+            notificationService.createU2UNotification(
+                    post.getUser().getId(),
+                    userId,
+                    Enums.NotificationType.REPLY_COMMENT.getValue(),
+                    "User " + user.getUserName() + " has replied your comment."
+            );
+        }
         return apiResponseUtils.success(new CommentDto(comment), "Create new comment successfully!");
     }
 
     @Override
     public ApiResponse<List<CommentDto>> getAllCommentOfUser(Long userId) {
         User user = userService.getUserById(userId);
-        List<Comment> comments = commentRepository.findCommentsExistByUserIdOrderByCreatedAtAsc(user.getId());
+        List<Comment> comments = commentRepository.findCommentsExistByUserIdOrderByCreatedAtDesc(user.getId());
         comments.forEach(comment ->
                 comment.setCommentmedia(comment.getCommentmedia().stream()
                         .filter(cm -> !cm.getIsDelete()).collect(Collectors.toList()))
@@ -108,7 +126,7 @@ public class CommentServiceImpl implements CommentService {
         if (validationService.hasNotPermissionToAction(user, post, Enums.VisibilityLevel.fromValue(post.getVisibilityLevel()))) {
             throw new IllegalArgumentException("You do not have permission to comment on this post!");
         }
-        List<Comment> allComments = commentRepository.findParentsCommentsExistByPostIdOrderByCreatedAtAsc(postId);
+        List<Comment> allComments = commentRepository.findParentsCommentsExistByPostIdOrderByCreatedAtDesc(postId);
         // Map to store CommentDto objects by their ID for easy lookup
         Map<String, CommentDto> commentMap = new HashMap<>();
         // Iterate over the list of comments to populate the map

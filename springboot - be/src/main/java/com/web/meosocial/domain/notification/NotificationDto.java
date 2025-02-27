@@ -8,11 +8,10 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class NotificationDto {
-    private Long id;
+    private String id;
     private Long recipientId;
     private Long senderId;
     private Integer type;
-    private Long referenceId;
     private Integer referenceType;
     private String content;
     private Boolean isRead;
@@ -25,7 +24,6 @@ public class NotificationDto {
             this.recipientId = notification.getRecipient() != null ? notification.getRecipient().getId() : null;
             this.senderId = notification.getSenderId();
             this.type = notification.getType();
-            this.referenceId = notification.getReferenceId();
             this.referenceType = notification.getReferenceType();
             this.content = notification.getContent();
             this.isRead = notification.getIsRead();
