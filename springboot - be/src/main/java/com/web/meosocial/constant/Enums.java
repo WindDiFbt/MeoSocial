@@ -85,4 +85,54 @@ public class Enums {
             throw new IllegalArgumentException("Unexpected value: " + value);
         }
     }
+
+    @Getter
+    public enum NotificationType {
+        SYSTEM_NOTI(0),
+        COMMENT_ON_POST(1),
+        LIKE_POST(2),
+        LIKE_COMMENT(3),
+        REPLY_COMMENT(4),
+        FOLLOW_REQUEST(5),
+        FOLLOW_REQUEST_ACCEPTED(6),
+        NEW_FOLLOWER(7),
+        SECURITY_ALERT(8),
+        NEW_FEATURE(9),
+        NEW_FOLLOW_SUGGESTION(10),
+        SHARE_POST(11);
+        private final Integer value;
+
+        private NotificationType(Integer value) {
+            this.value = value;
+        }
+
+        public static NotificationType fromValue(int value) {
+            for (NotificationType type : NotificationType.values()) {
+                if (type.getValue() == value) {
+                    return type;
+                }
+            }
+            throw new IllegalArgumentException("Unexpected value: " + value);
+        }
+    }
+
+    @Getter
+    public enum ReferenceType {
+        SYSTEM_TO_USER(0),
+        USER_TO_USER(1);
+        private final Integer value;
+
+        private ReferenceType(Integer value) {
+            this.value = value;
+        }
+
+        public static ReferenceType fromValue(int value) {
+            for (ReferenceType type : ReferenceType.values()) {
+                if (type.getValue() == value) {
+                    return type;
+                }
+            }
+            throw new IllegalArgumentException("Unexpected value: " + value);
+        }
+    }
 }

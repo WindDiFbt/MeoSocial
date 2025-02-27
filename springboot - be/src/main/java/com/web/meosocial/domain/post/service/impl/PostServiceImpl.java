@@ -2,6 +2,7 @@ package com.web.meosocial.domain.post.service.impl;
 
 import com.web.meosocial.constant.Enums;
 import com.web.meosocial.domain.comment.service.CommentService;
+import com.web.meosocial.domain.notification.service.NotificationService;
 import com.web.meosocial.domain.post.dto.ChangeVisibilityDto;
 import com.web.meosocial.domain.post.dto.PostDto;
 import com.web.meosocial.domain.post.dto.SharedPostDto;
@@ -38,6 +39,8 @@ public class PostServiceImpl implements PostService {
     private UserRelationshipService userRelationshipService;
     @Autowired
     private ApiResponseUtils apiResponseUtils;
+    @Autowired
+    private NotificationService notificationService;
 
     /**
      * Creates a new post.
@@ -256,6 +259,12 @@ public class PostServiceImpl implements PostService {
         newPost.setSharedPostId(sharedPostDto.getSharedPostId());
         newPost.setIsSharedPostAvailable(true);
         newPost = savePostInformation(newPost, sharedPostDto.getContent(), sharedPostDto.getVisibilityLevel());
+        notificationService.createU2UNotification(
+                getPostById(sharedPostDto.getSharedPostId()).getUser().getId(),
+                userId,
+                Enums.NotificationType.SHARE_POST.getValue(),
+                "User " + user.getUserName() + " shared your post!"
+        );
         return new PostDto(newPost);
     }
 }

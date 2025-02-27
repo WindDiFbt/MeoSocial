@@ -1,12 +1,13 @@
 package com.web.meosocial.domain.user.service.impl;
 
 import com.web.meosocial.constant.Enums;
+import com.web.meosocial.domain.notification.service.NotificationService;
 import com.web.meosocial.domain.user.dto.UserRelationshipDto;
 import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.model.UserRelationship;
 import com.web.meosocial.domain.user.repository.UserRelationshipRepository;
+import com.web.meosocial.domain.user.repository.UserRepository;
 import com.web.meosocial.domain.user.service.UserRelationshipService;
-import com.web.meosocial.domain.user.service.UserService;
 import com.web.meosocial.util.UUID64Generator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,9 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
     @Autowired
     private UserRelationshipRepository userRelaRepository;
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
+    @Autowired
+    private NotificationService notificationService;
     private final UUID64Generator uuid64Generator = new UUID64Generator();
     private static final Logger LOGGER = LoggerFactory.getLogger(UserRelationshipServiceImpl.class);
 
@@ -37,23 +40,23 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
      */
     @Transactional
     @Override
-    public UserRelationshipDto followUser(UserRelationshipDto userRelationshipDto) {
-        if (userRelationshipDto.getFollowerId().equals(userRelationshipDto.getFollowingId())) {
+    public UserRelationshipDto followUser(Long followerId, UserRelationshipDto userRelationshipDto) {
+        if (followerId.equals(userRelationshipDto.getFollowingId())) {
             throw new IllegalArgumentException("Follower and Following cannot be the same user.");
         }
-        User follower = userService.getUserById(userRelationshipDto.getFollowerId());
-        User following = userService.getUserById(userRelationshipDto.getFollowingId());
-        UserRelationship followerToFollowing = userRelaRepository.getUserRelationship(userRelationshipDto.getFollowerId(), userRelationshipDto.getFollowingId());
-        UserRelationship followingToFollower = userRelaRepository.getUserRelationship(userRelationshipDto.getFollowingId(), userRelationshipDto.getFollowerId());
+        User follower = getUserById(followerId);
+        User following = getUserById(userRelationshipDto.getFollowingId());
+        UserRelationship followerToFollowing = userRelaRepository.getUserRelationship(followerId, userRelationshipDto.getFollowingId());
+        UserRelationship followingToFollower = userRelaRepository.getUserRelationship(userRelationshipDto.getFollowingId(), followerId);
         if (followerToFollowing == null) {
             return handleNoExistingFollowingToFollower(follower, following, followingToFollower);
         }
         return switch (Enums.RelationshipStatus.fromValue(followerToFollowing.getStatus())) {
             case UNFOLLOW -> handleExistingFollowingToFollower(followerToFollowing, followingToFollower);
             case FOLLOW ->
-                    throw new IllegalArgumentException("User id: " + userRelationshipDto.getFollowerId() + " followed user id: " + userRelationshipDto.getFollowingId());
+                    throw new IllegalArgumentException("User id: " + followerId + " followed user id: " + userRelationshipDto.getFollowingId());
             case BLOCKED ->
-                    throw new IllegalArgumentException("User id: " + userRelationshipDto.getFollowerId() + " is blocked user id: " + userRelationshipDto.getFollowingId());
+                    throw new IllegalArgumentException("User id: " + followerId + " is blocked user id: " + userRelationshipDto.getFollowingId());
         };
     }
 
@@ -110,12 +113,12 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
      */
     @Transactional
     @Override
-    public UserRelationshipDto unfollowUser(UserRelationshipDto userRelationshipDto) {
-        if (userRelationshipDto.getFollowerId().equals(userRelationshipDto.getFollowingId())) {
+    public UserRelationshipDto unfollowUser(Long followerId, UserRelationshipDto userRelationshipDto) {
+        if (followerId.equals(userRelationshipDto.getFollowingId())) {
             throw new IllegalArgumentException("Follower and Following cannot be the same user.");
         }
-        UserRelationship followerToFollowing = userRelaRepository.getUserRelationship(userRelationshipDto.getFollowerId(), userRelationshipDto.getFollowingId());
-        UserRelationship followingToFollower = userRelaRepository.getUserRelationship(userRelationshipDto.getFollowingId(), userRelationshipDto.getFollowerId());
+        UserRelationship followerToFollowing = userRelaRepository.getUserRelationship(followerId, userRelationshipDto.getFollowingId());
+        UserRelationship followingToFollower = userRelaRepository.getUserRelationship(userRelationshipDto.getFollowingId(), followerId);
         if (followerToFollowing == null || followerToFollowing.getStatus().equals(Enums.RelationshipStatus.UNFOLLOW.getValue())) {
             throw new IllegalArgumentException("User didn't follow user target.");
         }
@@ -151,14 +154,14 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
      */
     @Transactional
     @Override
-    public UserRelationshipDto blockUser(UserRelationshipDto userRelationshipDto) {
-        if (userRelationshipDto.getFollowerId().equals(userRelationshipDto.getFollowingId())) {
+    public UserRelationshipDto blockUser(Long followerId, UserRelationshipDto userRelationshipDto) {
+        if (followerId.equals(userRelationshipDto.getFollowingId())) {
             throw new IllegalArgumentException("Blocker and Blocked cannot be the same user.");
         }
-        User follower = userService.getUserById(userRelationshipDto.getFollowerId());
-        User following = userService.getUserById(userRelationshipDto.getFollowingId());
-        UserRelationship blockerToBlocked = userRelaRepository.getUserRelationship(userRelationshipDto.getFollowerId(), userRelationshipDto.getFollowingId());
-        UserRelationship blockedToBlocker = userRelaRepository.getUserRelationship(userRelationshipDto.getFollowingId(), userRelationshipDto.getFollowerId());
+        User follower = getUserById(followerId);
+        User following = getUserById(userRelationshipDto.getFollowingId());
+        UserRelationship blockerToBlocked = userRelaRepository.getUserRelationship(followerId, userRelationshipDto.getFollowingId());
+        UserRelationship blockedToBlocker = userRelaRepository.getUserRelationship(userRelationshipDto.getFollowingId(), followerId);
         // Check if the blocked user has already blocked the blocker
         if (blockedToBlocker != null && blockedToBlocker.getStatus().equals(Enums.RelationshipStatus.BLOCKED.getValue())) {
             throw new IllegalArgumentException("Cannot block. User is already blocked by the target user.");
@@ -201,12 +204,12 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
      */
     @Transactional
     @Override
-    public UserRelationshipDto unblockUser(UserRelationshipDto userRelationshipDto) {
-        if (userRelationshipDto.getFollowerId().equals(userRelationshipDto.getFollowingId())) {
+    public UserRelationshipDto unblockUser(Long followerId, UserRelationshipDto userRelationshipDto) {
+        if (followerId.equals(userRelationshipDto.getFollowingId())) {
             throw new IllegalArgumentException("Follower and Following cannot be the same user.");
         }
-        UserRelationship blockerToBlocked = userRelaRepository.getUserRelationship(userRelationshipDto.getFollowerId(), userRelationshipDto.getFollowingId());
-        UserRelationship blockedToBlocker = userRelaRepository.getUserRelationship(userRelationshipDto.getFollowingId(), userRelationshipDto.getFollowerId());
+        UserRelationship blockerToBlocked = userRelaRepository.getUserRelationship(followerId, userRelationshipDto.getFollowingId());
+        UserRelationship blockedToBlocker = userRelaRepository.getUserRelationship(userRelationshipDto.getFollowingId(), followerId);
         if (blockerToBlocked == null || !blockerToBlocked.getStatus().equals(Enums.RelationshipStatus.BLOCKED.getValue())) {
             throw new IllegalArgumentException("No existing block relationship found to unblock.");
         } else {
@@ -241,6 +244,12 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
         relationship.setHasMutualFollow(hasMutualFollow);
         relationship.setCreatedAt(LocalDateTime.now());
         userRelaRepository.save(relationship);
+        notificationService.createU2UNotification(
+                following.getId(),
+                follower.getId(),
+                Enums.NotificationType.NEW_FOLLOWER.getValue(),
+                "User " + follower.getUserName() + " is following you!"
+        );
         LOGGER.info("Creating new relationship: followerId - {}, followingId - {}, status - {}, hasMutualFollow - {}",
                 follower.getId(), following.getId(), status, hasMutualFollow);
         return new UserRelationshipDto(relationship);
@@ -257,6 +266,14 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
         userRelationshipExisted.setStatus(status);
         userRelationshipExisted.setHasMutualFollow(hasMutualFollow);
         userRelationshipExisted.setUpdatedAt(LocalDateTime.now());
+        if (status.equals(Enums.RelationshipStatus.FOLLOW.getValue())) {
+            notificationService.createU2UNotification(
+                    userRelationshipExisted.getFollowing(),
+                    userRelationshipExisted.getFollower().getId(),
+                    Enums.NotificationType.NEW_FOLLOWER.getValue(),
+                    "User " + userRelationshipExisted.getFollower().getUserName() + " is following you!"
+            );
+        }
         LOGGER.info("Updating relationship: relationshipId - {}, status - {}, hasMutualFollow - {}",
                 userRelationshipExisted.getId(), status, hasMutualFollow);
         userRelaRepository.save(userRelationshipExisted);
@@ -280,7 +297,6 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
         return relationship != null && relationship.getHasMutualFollow();
     }
 
-
     @Override
     public Boolean IsUserBlocked(Long followerId, Long followingId) {
         if (followerId == null || followingId == null) {
@@ -290,4 +306,11 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
         return relationship != null && relationship.getStatus().equals(Enums.RelationshipStatus.BLOCKED.getValue());
     }
 
+    private User getUserById(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null || user.getUserStatus().equals(Enums.UserStatus.NOT_AVAILABLE.getValue())) {
+            throw new IllegalArgumentException("User not found or not available.");
+        }
+        return user;
+    }
 }
