@@ -1,5 +1,5 @@
 import React from "react";
-import "./index.css"
+import { Link } from "react-router-dom";
 
 export default function LandingPage() {
   return (
@@ -7,9 +7,11 @@ export default function LandingPage() {
       <header className="bg-blue-600 text-white text-center py-16">
         <h1 className="text-5xl font-bold">Mạng Xã Hội Meo Social</h1>
         <p className="mt-4 text-lg">Kết nối, chia sẻ và khám phá thế giới xung quanh bạn</p>
-        <button className="mt-6 px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg shadow-lg hover:bg-gray-200">
-          Tham gia ngay
-        </button>
+        <Link to="/login">
+          <button className="mt-6 px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg shadow-lg hover:bg-gray-200">
+            Đăng nhập
+          </button>
+        </Link>
       </header>
 
       <section className="py-16 text-center">
