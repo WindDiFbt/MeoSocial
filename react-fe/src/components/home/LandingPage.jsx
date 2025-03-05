@@ -1,6 +1,6 @@
 import React from "react";
-import { Link } from "react-router-dom";
-
+import { Link } from "react-router-dom"
+import Footer from "../shared/Footer"
 export default function LandingPage() {
   return (
     <div className="font-sans bg-gray-100 text-gray-900">
@@ -54,6 +54,7 @@ export default function LandingPage() {
           Đăng ký ngay
         </button>
       </section>
+      <Footer />
     </div>
   );
 }

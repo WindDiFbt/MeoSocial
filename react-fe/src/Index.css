@@ -1,2 +1,7 @@
 @import "tailwindcss";
 @import "nprogress/nprogress.css";
+
+html {
+    padding-right: 0 !important;
+    overflow-y: auto !important;
+}
