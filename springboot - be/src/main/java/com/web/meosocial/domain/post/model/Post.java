@@ -75,7 +75,7 @@ public class Post {
             this.updatedAt = postDto.getUpdatedAt();
             if (postDto.getUserId() != null) {
                 this.user = new User();
-                this.user.setId(postDto.getUserId());
+                this.user.setId(Long.parseLong(postDto.getUserId()));
             }
             this.deletedAt = postDto.getDeletedAt();
         }

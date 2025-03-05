@@ -67,4 +67,9 @@ public class RestPostController {
         long userId = authUtils.getCurrentUserId();
         return ResponseEntity.ok().body(likeService.unlikePost(userId, postId));
     }
+
+    @GetMapping("")
+    public ResponseEntity<?> getAllPosts() {
+        return ResponseEntity.ok().body(postService.getAllPostsOfUser(authUtils.getCurrentUserId()));
+    }
 }
