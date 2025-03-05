@@ -26,7 +26,7 @@ API.interceptors.response.use(
     (error) => {
         nProgress.done();
         if (error.response) {
-            toast.error(error.response.data.message || "Lỗi không xác định!");
+            toast.error(error.response.data.message || "Exception");
         }
         return Promise.reject(error);
     }

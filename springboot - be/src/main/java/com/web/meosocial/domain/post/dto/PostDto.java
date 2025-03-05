@@ -14,7 +14,9 @@ import java.util.stream.Collectors;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostDto {
     private String id;
-    private Long userId;
+    private String userId;
+    private String userName;
+    private String fullName;
     private String content;
     private Integer visibilityLevel;
     private Boolean isDelete;
@@ -31,7 +33,9 @@ public class PostDto {
     public PostDto(Post post) {
         if (post != null) {
             this.id = post.getId();
-            this.userId = post.getUser() != null ? post.getUser().getId() : null;
+            this.userId = String.valueOf(post.getUser().getId());
+            this.userName = post.getUser().getUserName();
+            this.fullName = post.getUser().getUserinfo().getFullName();
             this.content = post.getContent();
             this.visibilityLevel = post.getVisibilityLevel();
             this.isDelete = post.getIsDelete();

@@ -26,7 +26,7 @@ const LoginPage = () => {
             localStorage.setItem("roles", JSON.stringify(roles));
             if (roles.includes("ROLE_USER")) {
                 toast.success("User login successfully!");
-                navigate('/');
+                navigate('/home');
             } else if (roles.includes("ROLE_ADMIN")) {
                 toast.success("Admin login successfully!");
                 navigate('/');

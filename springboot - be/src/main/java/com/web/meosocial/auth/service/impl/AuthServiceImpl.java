@@ -77,7 +77,7 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = jwtUtils.generateAccessToken(authentication);
         LoginResponse loginResponse = LoginResponse.builder()
                 .username(userDetails.getUsername())
-                .id(userDetails.getId())
+                .id(String.valueOf(userDetails.getId()))
                 .accessToken(accessToken)
                 .type("Bearer")
                 .refreshToken(refreshToken.getToken())
