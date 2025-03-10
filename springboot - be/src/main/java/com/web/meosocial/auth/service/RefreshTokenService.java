@@ -1,6 +1,7 @@
 package com.web.meosocial.auth.service;
 
 import com.web.meosocial.auth.models.RefreshToken;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,4 +13,6 @@ public interface RefreshTokenService {
     void deleteRefreshToken(Long userId, String ipDevice);
 
     Long getUserIdByRefreshToken(String refreshToken);
+
+    void setRefreshTokenCookie(HttpServletResponse response, String refreshToken);
 }
