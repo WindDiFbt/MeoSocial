@@ -106,7 +106,6 @@ public class PostServiceImpl implements PostService {
     @Override
     public ApiResponse<Void> deletePost(Long userId, String postId) {
         Post post = getPostById(postId);
-        List<Post> sharedPosts = postRepository.findAllBySharedPostId(post.getId());
         if (!post.getUser().getId().equals(userId)) {
             throw new UnauthorizedException("User is not authorized to delete this post");
         }
@@ -114,10 +113,11 @@ public class PostServiceImpl implements PostService {
         post.setDeletedAt(LocalDateTime.now());
         postMediaService.deletePostMediaOfPost(postId);
         commentService.deleteCommentOfPost(postId);
+        List<Post> sharedPosts = postRepository.findAllBySharedPostId(post.getId());
         sharedPosts.forEach(sharedPost ->
                 sharedPost.setIsSharedPostAvailable(false));
-        postRepository.save(post);
         postRepository.saveAll(sharedPosts);
+        postRepository.save(post);
         return apiResponseUtils.success(null, "Post deleted successfully!");
     }
 
