@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: MeoSocial
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  data:
+    redis:
+      repositories:
+        enabled: 'false'
+      port: '6379'
+      timeout: 60s
+      host: localhost
+  datasource:
+    password: '123456'
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    url: jdbc:mysql://localhost:3306/meosocial_main
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: 'true'
+app:
+  jwtSecretKey: XcOXNLcTzDlQqjp2JzMNJ7+fi7UQ3O8FAselbtKQSgM=
+  jwtExpirationMs: '1800000'
+  jwtRefreshExpirationMs: '604800000'

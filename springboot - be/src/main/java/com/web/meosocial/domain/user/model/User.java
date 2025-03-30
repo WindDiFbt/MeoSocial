@@ -1,5 +1,6 @@
 package com.web.meosocial.domain.user.model;
 
+import com.web.meosocial.auth.models.RefreshToken;
 import com.web.meosocial.domain.comment.model.Comment;
 import com.web.meosocial.domain.notification.Notification;
 import com.web.meosocial.domain.post.model.Like;
@@ -68,6 +69,9 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles;
+
+    @OneToMany(mappedBy = "user")
+    private List<RefreshToken> refreshTokens;
 
     public User(UserDto userDto) {
         if (userDto != null) {

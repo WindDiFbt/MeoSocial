@@ -58,7 +58,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
         Cookie cookie = new Cookie("refreshToken", refreshToken);
         cookie.setHttpOnly(true);
-        cookie.setPath("/auth/refresh");
+        cookie.setPath("/");
         cookie.setSecure(true);
         cookie.setMaxAge(refreshTokenExpirationTime.intValue());
         response.addCookie(cookie);
