@@ -4,6 +4,8 @@ import com.web.meosocial.auth.models.RefreshToken;
 import com.web.meosocial.auth.repository.RefreshTokenRepository;
 import com.web.meosocial.auth.service.RefreshTokenService;
 import com.web.meosocial.domain.user.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -50,5 +52,15 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public Long getUserIdByRefreshToken(String refreshToken) {
         return refreshTokenRepository.findByToken(refreshToken).get().getUser().getId();
+    }
+
+    @Override
+    public void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+        Cookie cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setSecure(true);
+        cookie.setMaxAge(refreshTokenExpirationTime.intValue());
+        response.addCookie(cookie);
     }
 }

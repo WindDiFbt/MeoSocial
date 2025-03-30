@@ -24,6 +24,7 @@ import com.web.meosocial.payload.response.RefreshTokenResponse;
 import com.web.meosocial.util.ApiResponseUtils;
 import com.web.meosocial.util.UUID64Generator;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
     private final UUID64Generator uuid64Generator = new UUID64Generator();
 
     @Override
-    public ResponseEntity<ApiResponse<?>> login(LoginRequest loginRequest, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<?>> login(LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getIdentifier(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -74,6 +75,7 @@ public class AuthServiceImpl implements AuthService {
         String ipDevice = authUtils.getDeviceId(request);
         refreshTokenService.deleteRefreshToken(userDetails.getId(), ipDevice);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId(), ipDevice);
+        refreshTokenService.setRefreshTokenCookie(response, refreshToken.getToken());
         String accessToken = jwtUtils.generateAccessToken(authentication);
         LoginResponse loginResponse = LoginResponse.builder()
                 .username(userDetails.getUsername())
@@ -161,7 +163,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> refreshToken(String refreshToken) {
+    public ResponseEntity<ApiResponse<?>> refreshAccessToken(String refreshToken) {
         if (!refreshTokenService.validateRefreshToken(refreshToken)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     apiResponseUtils.success(null, "Invalid refresh token!")

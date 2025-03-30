@@ -45,6 +45,9 @@ public class PostMediaServiceImpl implements PostMediaService {
     @Transactional
     @Override
     public ApiResponse<PostMediaDto> createPostMedia(Long userId, String postId, MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File must not be null or empty");
+        }
         PostMedia postMedia = new PostMedia();
         Post post = postRepository.findById(postId).orElse(null);
         if (post == null || post.getIsDelete()) {
@@ -100,11 +103,6 @@ public class PostMediaServiceImpl implements PostMediaService {
     @Transactional
     @Override
     public void deletePostMediaOfPost(String postId) {
-        List<PostMedia> medias = postMediaRepository.findAllByPostId(postId, false);
-        medias.forEach(media -> {
-            media.setIsDelete(true);
-            media.setDeletedAt(LocalDateTime.now());
-        });
-        postMediaRepository.saveAll(medias);
+        postMediaRepository.updateIsDeleteAndDeletedAtByPostId(postId, true, LocalDateTime.now());
     }
 }
