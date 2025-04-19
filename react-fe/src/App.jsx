@@ -12,7 +12,9 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/home" element={<Home />} />
       </Routes>
-      <ToastContainer></ToastContainer>
+      <ToastContainer
+        position="bottom-left"
+        autoClose={3000} />
     </Router>
   );
 }

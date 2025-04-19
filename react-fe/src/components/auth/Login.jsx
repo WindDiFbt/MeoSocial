@@ -1,10 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../../services/APIService"
 import { toast } from "react-toastify";
+
 const LoginPage = () => {
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
+    const [remember, setRemember] = useState(false);
+    useEffect(() => {
+        const savedIdentifier = localStorage.getItem("savedIdentifier");
+        const savedPassword = localStorage.getItem("savedPassword");
+        if (savedIdentifier && savedPassword) {
+            setIdentifier(savedIdentifier);
+            setPassword(savedPassword);
+            setRemember(true);
+        }
+    }, []);
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
@@ -18,12 +29,18 @@ const LoginPage = () => {
                 toast.error("Your account does not exist.");
                 return;
             }
-            const { accessToken, refreshToken, id, username, roles } = response.data.response;
-            localStorage.setItem("accessToken", accessToken);
-            localStorage.setItem("refreshToken", refreshToken);
+            const { accessToken, id, username, roles } = response.data.response;
+            sessionStorage.setItem("accessToken", accessToken);
             localStorage.setItem("id", id);
             localStorage.setItem("username", username);
             localStorage.setItem("roles", JSON.stringify(roles));
+            if (remember) {
+                localStorage.setItem("savedIdentifier", identifier);
+                localStorage.setItem("savedPassword", password);
+            } else {
+                localStorage.removeItem("savedIdentifier");
+                localStorage.removeItem("savedPassword");
+            }
             if (roles.includes("ROLE_USER")) {
                 toast.success("User login successfully!");
                 navigate('/home');
@@ -60,6 +77,17 @@ const LoginPage = () => {
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
+                    </div>
+                    <div className="mb-4">
+                        <label className="inline-flex items-center">
+                            <input
+                                type="checkbox"
+                                className="form-checkbox"
+                                checked={remember}
+                                onChange={(e) => setRemember(e.target.checked)}
+                            />
+                            <span className="ml-2 text-gray-600">Remember Me</span>
+                        </label>
                     </div>
                     <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded-md">
                         Đăng nhập
