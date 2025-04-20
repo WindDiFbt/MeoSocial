@@ -1,21 +1,36 @@
 import axios from "axios";
 import nProgress from "nprogress";
+import { toast } from "react-toastify";
 
 const API = axios.create({
-    baseURL: "http://localhost:8080",
+    baseURL: import.meta.env.VITE_API_URL,
     withCredentials: true,
 });
+
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+const onRrefreshed = (token) => {
+    refreshSubscribers.map((callback) => callback(token));
+};
+
+const addRefreshSubscriber = (callback) => {
+    refreshSubscribers.push(callback);
+};
 
 API.interceptors.request.use(
     (config) => {
         nProgress.start();
-        const token = localStorage.getItem("accessToken");
+        const token = sessionStorage.getItem("accessToken");
         if (token) {
             config.headers["Authorization"] = `Bearer ${token}`;
         }
         return config;
     },
-    (error) => Promise.reject(error)
+    (error) => {
+        nProgress.done();
+        Promise.reject(error);
+    }
 );
 
 API.interceptors.response.use(
@@ -23,11 +38,40 @@ API.interceptors.response.use(
         nProgress.done();
         return response;
     },
-    (error) => {
+    async (error) => {
         nProgress.done();
-        if (error.response) {
-            toast.error(error.response.data.message || "Exception");
-        }
+        const { config, response: { status } } = error;
+        const originalRequest = config;
+
+        if (status === 401 && !originalRequest._retry) {
+            if (isRefreshing) {
+                return new Promise((resolve) => {
+                    addRefreshSubscriber((token) => {
+                        originalRequest.headers["Authorization"] = `Bearer ${token}`;
+                        resolve(axios(originalRequest));
+                    });
+                });
+            }
+
+            originalRequest._retry = true;
+            isRefreshing = true;
+
+            try {
+                const res = await axios.post(import.meta.env.VITE_REFRESH_URL, {}, { withCredentials: true });
+                const { accessToken } = res.data;
+                sessionStorage.setItem("accessToken", accessToken);
+                isRefreshing = false;
+                onRrefreshed(accessToken);
+                refreshSubscribers = [];
+                originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
+                return axios(originalRequest);
+            } catch (refreshError) {
+                isRefreshing = false;
+                toast.error("Your session has expired. Please login again.");
+                sessionStorage.removeItem("accessToken");
+                window.location.href = "/login";
+            }
+        } 
         return Promise.reject(error);
     }
 );
