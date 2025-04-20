@@ -10,6 +10,10 @@ public class CloudinaryConfig {
 
     @Bean
     public Cloudinary cloudinary() {
+        String url = System.getenv("CLOUDINARY_URL");
+        if (url != null) {
+            return new Cloudinary(url);
+        }
         Dotenv dotenv = Dotenv.load();
         return new Cloudinary(dotenv.get("CLOUDINARY_URL"));
     }

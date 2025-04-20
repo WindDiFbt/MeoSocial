@@ -11,7 +11,7 @@ spring:
         enabled: 'false'
       port: '6379'
       timeout: 60s
-      host: localhost
+      host: ${SPRING_REDIS_HOST:localhost}
   datasource:
     password: '123456'
     driver-class-name: com.mysql.cj.jdbc.Driver
