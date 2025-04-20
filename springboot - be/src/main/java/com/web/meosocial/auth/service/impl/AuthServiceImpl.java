@@ -154,7 +154,7 @@ public class AuthServiceImpl implements AuthService {
             redisService.blacklistToken(accessToken, expiration);
             SecurityContextHolder.clearContext();
             return ResponseEntity.ok().body(
-                    apiResponseUtils.success(null, "Successfully logged out!" + expiration)
+                    apiResponseUtils.success(null, "Successfully logged out!")
             );
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
