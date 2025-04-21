@@ -1,6 +1,8 @@
 spring:
   application:
     name: MeoSocial
+  config:
+    import: optional:file:.env[.properties]
   servlet:
     multipart:
       max-file-size: 100MB
@@ -9,19 +11,20 @@ spring:
     redis:
       repositories:
         enabled: 'false'
-      port: '6379'
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
       timeout: 60s
-      host: ${SPRING_REDIS_HOST:localhost}
   datasource:
-    password: '123456'
+    url: ${RW_MYSQL_DATABASE_URL}
+    username: ${MYSQL_USER}
+    password: ${RW_MYSQL_ROOT_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    url: jdbc:mysql://localhost:3306/meosocial_main
   jpa:
     hibernate:
       ddl-auto: none
     show-sql: 'true'
 app:
-  jwtSecretKey: XcOXNLcTzDlQqjp2JzMNJ7+fi7UQ3O8FAselbtKQSgM=
-  jwtExpirationMs: '1800000'
-  jwtRefreshExpirationMs: '604800000'
+  jwtSecretKey: ${JWT_SECRET_KEY}
+  jwtExpirationMs: ${JWT_EXPIRATION_MS}
+  jwtRefreshExpirationMs: ${REFRESH_TOKEN_EXPIRATION_MS}
