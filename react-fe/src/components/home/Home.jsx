@@ -82,7 +82,6 @@ export default function Home() {
                                 </div>
                             )}
 
-                            {/* ✅ Các nút Like, Comment, Share */}
                             <div className="flex justify-between items-center mt-4 text-gray-600">
                                 <button className="flex items-center space-x-1 hover:text-red-500">
                                     <Heart size={20} />

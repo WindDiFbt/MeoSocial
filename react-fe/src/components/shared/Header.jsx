@@ -2,10 +2,24 @@ import { useState } from "react";
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { Search, Home, Users, Bell, User } from "lucide-react";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { logout as logoutAction} from "../../redux/slices/AuthSlice";
 
 export default function Header() {
     const [search, setSearch] = useState("");
-
+    const dispatch = useDispatch();
+    
+    const handleLogout = () => {
+        // Handle logout logic here
+        sessionStorage.removeItem("accessToken");
+        localStorage.removeItem("id");
+        localStorage.removeItem("username");
+        localStorage.removeItem("roles");
+        dispatch(logoutAction());
+        toast.success("Logout successfully!");
+        window.location.href = "/login";
+    };
     return (
         <header className="flex items-center justify-between bg-white p-4 shadow-md fixed w-full top-0 z-50">
             <div className="text-xl font-bold text-blue-600">MeoSocial</div>
@@ -70,7 +84,7 @@ export default function Header() {
                         </MenuItem>
                         <MenuItem>
                             {({ active }) => (
-                                <button
+                                <button onClick={handleLogout}
                                     className={`block w-full text-left px-4 py-2 text-sm text-red-600 ${active ? "bg-gray-100" : ""
                                         }`}
                                 >
