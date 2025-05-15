@@ -5,27 +5,35 @@ import { toast } from "react-toastify";
 
 const RegisterPage = () => {
     const [username, setUsername] = useState('');
-    // const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [errors, setErrors] = useState([]);
     const navigate = useNavigate();
-
+    
     const handleRegister = async (e) => {
         e.preventDefault();
+        setErrors([]);
         if (password !== confirmPassword) {
-            toast.error("Passwords do not match!");
+            setErrors(["Passwords do not match!"]);
             return;
         }
         try {
             const response = await register(username, password);
-            if (response && response.data.success) {
+            if (response && response.data.status === "200 OK") {
                 toast.success("Registration successful! Please log in.");
                 navigate('/login');
             } else {
-                toast.error(response?.data?.message || "Registration failed!");
+                setErrors([response?.data?.message || "Registration failed!"]);
             }
         } catch (error) {
-            toast.error("An error occurred during registration.");
+            const backendErrors = error?.response?.data?.message;
+            if (Array.isArray(backendErrors)) {
+                setErrors(backendErrors);
+            } else if (typeof backendErrors === "string") {
+                setErrors([backendErrors]);
+            } else {
+                setErrors(["An unexpected error occurred."]);
+            }
         }
     };
 
@@ -44,16 +52,6 @@ const RegisterPage = () => {
                             required
                         />
                     </div>
-                    {/* <div className="mb-4">
-                        <label className="block text-gray-600">Email</label>
-                        <input
-                            type="email"
-                            className="w-full px-4 py-2 border rounded-md"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </div> */}
                     <div className="mb-4">
                         <label className="block text-gray-600">Mật khẩu</label>
                         <input
@@ -78,6 +76,15 @@ const RegisterPage = () => {
                         Đăng ký
                     </button>
                 </form>
+                {errors.length > 0 && (
+                    <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded text-sm">
+                        <ul className="list-disc pl-5">
+                            {errors.map((error, index) => (
+                                <li key={index}>{error}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
                 <p className="mt-4 text-center text-gray-600">
                     Đã có tài khoản?{" "}
                     <a href="/login" className="text-blue-500 hover:underline">

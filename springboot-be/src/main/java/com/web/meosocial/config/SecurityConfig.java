@@ -69,12 +69,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/**").permitAll()
                         .requestMatchers("/api/notifications/**").hasRole("USER")
                         .requestMatchers("/login").permitAll()
-//                        .requestMatchers("/admin/**").hasRole("ADMIN")
-//                        .requestMatchers("/user/register").permitAll()
-//                        .requestMatchers("/user/**", "/post/**").permitAll()
-//                        .requestMatchers("/post-media/**", "/comment/**", "/comment-media/**").hasRole("USER")
                         .anyRequest().authenticated())
-//                .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint))
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

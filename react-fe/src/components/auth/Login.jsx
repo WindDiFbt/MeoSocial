@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { login } from "../../services/APIService"
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { login as loginAction } from "../../redux/slices/AuthSlice";
 
 const LoginPage = () => {
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [remember, setRemember] = useState(false);
+    const dispatch = useDispatch();
     useEffect(() => {
         const savedIdentifier = localStorage.getItem("savedIdentifier");
         const savedPassword = localStorage.getItem("savedPassword");
@@ -22,10 +25,11 @@ const LoginPage = () => {
         e.preventDefault();
         if (identifier === '' || password === '') {
             toast.error('Username or password blank');
+            return;
         }
         try {
             const response = await login(identifier.trim(), password.trim());
-            if (!response || !response.data.response) {
+            if (response.data.status === "401 UNAUTHORIZED") {
                 toast.error("Your account does not exist.");
                 return;
             }
@@ -34,6 +38,7 @@ const LoginPage = () => {
             localStorage.setItem("id", id);
             localStorage.setItem("username", username);
             localStorage.setItem("roles", JSON.stringify(roles));
+            dispatch(loginAction({ id, username, roles }));
             if (remember) {
                 localStorage.setItem("savedIdentifier", identifier);
                 localStorage.setItem("savedPassword", password);
@@ -59,13 +64,12 @@ const LoginPage = () => {
                 <h2 className="text-2xl font-bold text-center text-gray-700">Đăng nhập</h2>
                 <form onSubmit={handleLogin} className="mt-4">
                     <div className="mb-4">
-                        <label className="block text-gray-600">Tên đăng nhập</label>
+                        <label className="block text-gray-600">Tên đăng nhập hoặc email</label>
                         <input
                             type="text"
                             className="w-full px-4 py-2 border rounded-md"
                             value={identifier}
                             onChange={(e) => setIdentifier(e.target.value)}
-                            required
                         />
                     </div>
                     <div className="mb-4">
@@ -75,7 +79,6 @@ const LoginPage = () => {
                             className="w-full px-4 py-2 border rounded-md"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            required
                         />
                     </div>
                     <div className="mb-4">
@@ -93,6 +96,22 @@ const LoginPage = () => {
                         Đăng nhập
                     </button>
                 </form>
+                <p className="mt-4 text-center text-gray-600">
+                    Chưa có tài khoản?{" "}
+                    <Link to="/register" className="text-green-500 hover:underline">
+                        Đăng ký
+                    </Link>
+                </p>
+                <p className="mt-2 text-center text-gray-600 text-sm">
+                    <Link to="/" className="text-blue-500 hover:underline">
+                        Quên mật khẩu?
+                    </Link>
+                </p>
+                <p className="mt-2 text-center text-gray-600">
+                    <Link to="/" className="text-blue-500 hover:underline">
+                        Trang chủ
+                    </Link>
+                </p>
             </div>
         </div>
     );
