@@ -5,6 +5,8 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -83,12 +85,24 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = NullPointerException.class)
-    public ResponseEntity<ApiResponse<?>> NullPointerExceptionHandler(HttpRequestMethodNotSupportedException exception) {
+    public ResponseEntity<ApiResponse<?>> NullPointerExceptionHandler(NullPointerException exception) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(
                         ApiResponse.builder()
                                 .status(String.valueOf(HttpStatus.BAD_REQUEST))
+                                .message(List.of(exception.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(value = org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<ApiResponse<?>> AuthenticationExceptionHandler(AuthenticationException exception) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(
+                        ApiResponse.builder()
+                                .status(String.valueOf(HttpStatus.UNAUTHORIZED))
                                 .message(List.of(exception.getMessage()))
                                 .build()
                 );

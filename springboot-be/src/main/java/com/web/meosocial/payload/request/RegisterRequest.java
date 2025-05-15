@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegisterRequest {
-    private String userName;
+    private String username;
     private String password;
     private List<String> roles;
 }

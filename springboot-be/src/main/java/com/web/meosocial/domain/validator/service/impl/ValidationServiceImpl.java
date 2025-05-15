@@ -25,7 +25,7 @@ public class ValidationServiceImpl implements ValidationService {
     @Override
     public void getUserRegisterError(RegisterRequest registerRequest) {
         List<String> errorMessages = new ArrayList<>();
-        errorMessages.add(ValidationUtils.validateUsername(registerRequest.getUserName()));
+        errorMessages.add(ValidationUtils.validateUsername(registerRequest.getUsername()));
         errorMessages.add(ValidationUtils.validatePassword(registerRequest.getPassword()));
         throwError(errorMessages);
     }

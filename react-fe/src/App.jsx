@@ -2,7 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import LandingPage from "./components/home/LandingPage";
 import LoginPage from "./components/auth/Login";
-import Home from "./components/home/Home";
+import HomePage from "./components/home/Home";
+import RegisterPage from "./components/auth/Register";
 
 function App() {
   return (
@@ -10,7 +11,8 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/home" element={<Home />} />
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/register" element={<RegisterPage />} />
       </Routes>
       <ToastContainer
         position="bottom-left"

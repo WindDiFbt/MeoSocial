@@ -92,7 +92,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<ApiResponse<?>> register(RegisterRequest registerRequest) throws RoleNotFoundException, UserAlreadyExistsException {
-        if (userService.existsByUserName(registerRequest.getUserName())) {
+        if (userService.existsByUserName(registerRequest.getUsername())) {
             throw new UserAlreadyExistsException("User name already exists!");
         }
         User user = createUser(registerRequest);
@@ -107,7 +107,7 @@ public class AuthServiceImpl implements AuthService {
         validationService.getUserRegisterError(registerRequest);
         return User.builder()
                 .id(uuid64Generator.generateUUID64())
-                .userName(registerRequest.getUserName())
+                .userName(registerRequest.getUsername())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .userStatus(Enums.UserStatus.AVAILABLE.getValue())
                 .createdAt(LocalDateTime.now())

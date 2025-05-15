@@ -5,16 +5,25 @@ import java.time.LocalDate;
 public class ValidationUtils {
 
     public static String validateUsername(String username) {
+        if(username.isEmpty()){
+            return "Username cannot be empty.";
+        }
         if (username.contains(" ")) {
             return "Username cannot contain spaces.";
         }
         if (username.length() < 5) {
             return "Username must be at least 5 characters long.";
         }
+        if (!username.matches("^[\\x00-\\x7F]+$")) {
+            return "Username cannot contain special characters or accents.";
+        }
         return null;
     }
 
     public static String validatePassword(String password) {
+        if (password.isEmpty()) {
+            return "Password cannot be empty.";
+        }
         if (password.length() < 8) {
             return "Password must be at least 8 characters long.";
         }

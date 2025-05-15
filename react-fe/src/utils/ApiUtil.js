@@ -3,7 +3,7 @@ import nProgress from "nprogress";
 import { toast } from "react-toastify";
 
 const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+    baseURL: import.meta.env.VITE_DEV_ENV_API_URL,
     withCredentials: true,
 });
 
@@ -16,7 +16,7 @@ const onRrefreshed = (token) => {
 
 const addRefreshSubscriber = (callback) => {
     refreshSubscribers.push(callback);
-};
+};  
 
 API.interceptors.request.use(
     (config) => {
@@ -57,7 +57,7 @@ API.interceptors.response.use(
             isRefreshing = true;
 
             try {
-                const res = await axios.post(import.meta.env.VITE_REFRESH_URL, {}, { withCredentials: true });
+                const res = await axios.post(import.meta.env.VITE_DEV_ENV_REFRESH_URL, {}, { withCredentials: true });
                 const { accessToken } = res.data;
                 sessionStorage.setItem("accessToken", accessToken);
                 isRefreshing = false;
