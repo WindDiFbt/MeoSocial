@@ -1,9 +1,13 @@
 import axios from "axios";
 import nProgress from "nprogress";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+
+const API_URL = import.meta.env.VITE_API_URL;
+const REFRESH_URL = `${API_URL}/refresh`;
 
 const API = axios.create({
-    baseURL: import.meta.env.VITE_DEV_ENV_API_URL,
+    baseURL: API_URL,
     withCredentials: true,
 });
 
@@ -16,7 +20,7 @@ const onRrefreshed = (token) => {
 
 const addRefreshSubscriber = (callback) => {
     refreshSubscribers.push(callback);
-};  
+};
 
 API.interceptors.request.use(
     (config) => {
@@ -40,10 +44,12 @@ API.interceptors.response.use(
     },
     async (error) => {
         nProgress.done();
-        const { config, response: { status } } = error;
-        const originalRequest = config;
-
-        if (status === 401 && !originalRequest._retry) {
+        const { config, response } = error;
+        const originalRequest = config;     
+        if (config.skipAuthRefresh) {
+            return Promise.reject(error);
+        }
+        if (response && response.status === 401 && !originalRequest._retry) {
             if (isRefreshing) {
                 return new Promise((resolve) => {
                     addRefreshSubscriber((token) => {
@@ -52,12 +58,10 @@ API.interceptors.response.use(
                     });
                 });
             }
-
             originalRequest._retry = true;
             isRefreshing = true;
-
             try {
-                const res = await axios.post(import.meta.env.VITE_DEV_ENV_REFRESH_URL, {}, { withCredentials: true });
+                const res = await axios.post(REFRESH_URL, {}, { withCredentials: true });
                 const { accessToken } = res.data;
                 sessionStorage.setItem("accessToken", accessToken);
                 isRefreshing = false;
@@ -69,9 +73,9 @@ API.interceptors.response.use(
                 isRefreshing = false;
                 toast.error("Your session has expired. Please login again.");
                 sessionStorage.removeItem("accessToken");
-                window.location.href = "/login";
+                useNavigate()("/login");
             }
-        } 
+        }
         return Promise.reject(error);
     }
 );

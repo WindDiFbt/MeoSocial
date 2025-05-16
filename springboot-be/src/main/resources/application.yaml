@@ -24,6 +24,9 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: 'true'
+server:
+  servlet:
+    context-path: /api/v1
 app:
   jwtSecretKey: ${JWT_SECRET_KEY}
   jwtExpirationMs: ${JWT_EXPIRATION_MS}

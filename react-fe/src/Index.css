@@ -5,3 +5,7 @@ html {
     padding-right: 0 !important;
     overflow-y: auto !important;
 }
+
+.Toastify__toast {
+  font-size: 14px;
+}

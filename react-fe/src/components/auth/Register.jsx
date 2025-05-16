@@ -18,7 +18,7 @@ const RegisterPage = () => {
             return;
         }
         try {
-            const response = await register(username, password);
+            const response = await register(username.trim(), password.trim());
             if (response && response.data.status === "200 OK") {
                 toast.success("Registration successful! Please log in.");
                 navigate('/login');

@@ -10,6 +10,9 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [remember, setRemember] = useState(false);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [errors, setErrors] = useState([]);
+
     useEffect(() => {
         const savedIdentifier = localStorage.getItem("savedIdentifier");
         const savedPassword = localStorage.getItem("savedPassword");
@@ -19,42 +22,43 @@ const LoginPage = () => {
             setRemember(true);
         }
     }, []);
-    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setErrors([]);
+
         if (identifier === '' || password === '') {
             toast.error('Username or password blank');
             return;
         }
         try {
             const response = await login(identifier.trim(), password.trim());
-            if (response.data.status === "401 UNAUTHORIZED") {
-                toast.error("Your account does not exist.");
-                return;
-            }
-            const { accessToken, id, username, roles } = response.data.response;
-            sessionStorage.setItem("accessToken", accessToken);
-            localStorage.setItem("id", id);
-            localStorage.setItem("username", username);
-            localStorage.setItem("roles", JSON.stringify(roles));
-            dispatch(loginAction({ id, username, roles }));
-            if (remember) {
-                localStorage.setItem("savedIdentifier", identifier);
-                localStorage.setItem("savedPassword", password);
+            if (response && response.data.status === "200 OK") {
+                const { accessToken, id, username, roles } = response.data.response;
+                sessionStorage.setItem("accessToken", accessToken);
+                localStorage.setItem("id", id);
+                localStorage.setItem("username", username);
+                localStorage.setItem("roles", JSON.stringify(roles));
+                dispatch(loginAction({ id, username, roles }));
+                if (remember) {
+                    localStorage.setItem("savedIdentifier", identifier);
+                    localStorage.setItem("savedPassword", password);
+                } else {
+                    localStorage.removeItem("savedIdentifier");
+                    localStorage.removeItem("savedPassword");
+                }
+                if (roles.includes("ROLE_USER")) {
+                    toast.success("User login successfully!");
+                    navigate('/home');
+                } else if (roles.includes("ROLE_ADMIN")) {
+                    toast.success("Admin login successfully!");
+                    navigate('/');
+                }
             } else {
-                localStorage.removeItem("savedIdentifier");
-                localStorage.removeItem("savedPassword");
-            }
-            if (roles.includes("ROLE_USER")) {
-                toast.success("User login successfully!");
-                navigate('/home');
-            } else if (roles.includes("ROLE_ADMIN")) {
-                toast.success("Admin login successfully!");
-                navigate('/');
+                toast.error(response?.data?.message || "Login failed!");
             }
         } catch (error) {
-            toast.error('Wrong Username or password!');
+            setErrors(['Wrong Username or password!']);
         }
     };
 
@@ -96,6 +100,15 @@ const LoginPage = () => {
                         Đăng nhập
                     </button>
                 </form>
+                {errors.length > 0 && (
+                    <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded text-sm">
+                        <ul className="list-disc pl-5">
+                            {errors.map((error, index) => (
+                                <li key={index}>{error}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
                 <p className="mt-4 text-center text-gray-600">
                     Chưa có tài khoản?{" "}
                     <Link to="/register" className="text-green-500 hover:underline">
