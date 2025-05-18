@@ -1,100 +1,75 @@
-import { useState } from "react";
-import { Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/react";
-import { Fragment } from "react";
-import { Search, Home, Users, Bell, User } from "lucide-react";
-import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
-import { logout as logoutAction} from "../../redux/slices/AuthSlice";
+import { useState, useRef, useEffect } from "react";
+import { Search, Inbox, Bell } from "lucide-react";
 
 export default function Header() {
-    const [search, setSearch] = useState("");
-    const dispatch = useDispatch();
-    
-    const handleLogout = () => {
-        // Handle logout logic here
-        sessionStorage.removeItem("accessToken");
-        localStorage.removeItem("id");
-        localStorage.removeItem("username");
-        localStorage.removeItem("roles");
-        dispatch(logoutAction());
-        toast.success("Logout successfully!");
-        window.location.href = "/login";
-    };
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchText, setSearchText] = useState("");
+    const searchRef = useRef(null);
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+        if (searchOpen && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [searchOpen]);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (searchRef.current && !searchRef.current.contains(e.target)) {
+                setSearchOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
     return (
         <header className="flex items-center justify-between bg-white p-4 shadow-md fixed w-full top-0 z-50">
-            <div className="text-xl font-bold text-blue-600">MeoSocial</div>
-
-            <div className="relative w-1/3">
-                <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
-                <input
-                    type="text"
-                    placeholder="Tìm kiếm..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="pl-10 w-full py-2 rounded-full border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+            {/* Logo */}
+            <div className="pl-2 flex items-center gap-2">
+                <img
+                    src="/meosocial_logo.png"
+                    alt="MeoSocial Logo"
+                    className="w-10 h-10 object-contain"
                 />
+                <span className="text-xl font-bold">MeoSocial</span>
             </div>
 
+            {/* Search area */}
+            <div className="relative pl-9 flex-1 flex">
+                <div className="w-100 h-11">
+                    <div
+                        ref={searchRef}
+                        onClick={() => !searchOpen && setSearchOpen(true)}
+                        className={`flex items-center border border-gray-300 transition-all duration-300 rounded-full cursor-pointer
+                            ${searchOpen ? "px-4 py-1 w-full" : "w-11 h-11 justify-center"}`}
+                    >
+                        <Search className="text-gray-500 shrink-0" size={17} />
+                        {searchOpen && (
+                            <input
+                                ref={inputRef}
+                                type="text"
+                                placeholder="Tìm kiếm..."
+                                value={searchText}
+                                onChange={(e) => setSearchText(e.target.value)}
+                                className="ml-2 w-full py-[5px] bg-transparent focus:outline-none"
+                            />
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Icons */}
             <div className="flex space-x-6">
-                <button className="p-2 hover:bg-gray-100 rounded-full">
-                    <Home className="text-gray-600" size={24} />
-                </button>
-                <button className="p-2 hover:bg-gray-100 rounded-full">
-                    <Users className="text-gray-600" size={24} />
-                </button>
                 <button className="p-2 hover:bg-gray-100 rounded-full">
                     <Bell className="text-gray-600" size={24} />
                 </button>
+                <button className="p-2 hover:bg-gray-100 rounded-full">
+                    <Inbox className="text-gray-600" size={24} />
+                </button>
             </div>
-
-            <Menu as="div" className="relative">
-                <MenuButton className="p-2 hover:bg-gray-100 rounded-full">
-                    <User className="text-gray-600" size={24} />
-                </MenuButton>
-
-                <Transition
-                    as={Fragment}
-                    enter="transition ease-out duration-100"
-                    enterFrom="transform opacity-0 scale-95"
-                    enterTo="transform opacity-100 scale-100"
-                    leave="transition ease-in duration-75"
-                    leaveFrom="transform opacity-100 scale-100"
-                    leaveTo="transform opacity-0 scale-95"
-                >
-                    <MenuItems static className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg">
-                        <MenuItem>
-                            {({ active }) => (
-                                <a
-                                    href="/profile"
-                                    className={`block px-4 py-2 text-sm ${active ? "bg-gray-100" : ""}`}
-                                >
-                                    Hồ sơ
-                                </a>
-                            )}
-                        </MenuItem>
-                        <MenuItem>
-                            {({ active }) => (
-                                <a
-                                    href="/settings"
-                                    className={`block px-4 py-2 text-sm ${active ? "bg-gray-100" : ""}`}
-                                >
-                                    Cài đặt
-                                </a>
-                            )}
-                        </MenuItem>
-                        <MenuItem>
-                            {({ active }) => (
-                                <button onClick={handleLogout}
-                                    className={`block w-full text-left px-4 py-2 text-sm text-red-600 ${active ? "bg-gray-100" : ""
-                                        }`}
-                                >
-                                    Đăng xuất
-                                </button>
-                            )}
-                        </MenuItem>
-                    </MenuItems>
-                </Transition>
-            </Menu>
         </header>
     );
 }

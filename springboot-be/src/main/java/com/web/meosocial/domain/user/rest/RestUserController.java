@@ -36,17 +36,17 @@ public class RestUserController {
         return ResponseEntity.ok().body(userService.updateStatus(authUtils.getCurrentUserId(), status));
     }
 
-    @GetMapping("/profiles")
+    @GetMapping("/profile")
     public ResponseEntity<?> getUser() {
         return ResponseEntity.ok().body(userInfoService.getUserInfo(authUtils.getCurrentUserId()));
     }
 
-    @PatchMapping("/profiles/update")
+    @PatchMapping("/profile/update")
     public ResponseEntity<?> updateProfile(@RequestBody UserInfoDto userInfoDto) {
         return ResponseEntity.ok().body(userInfoService.updateInformationUser(authUtils.getCurrentUserId(), userInfoDto));
     }
 
-    @PostMapping("/profiles/update/avatar")
+    @PostMapping("/profile/update/avatar")
     public ResponseEntity<?> updateAvatar(@RequestParam("avatar") MultipartFile avatar) throws IOException {
         return ResponseEntity.ok().body(userInfoService.updateUserAvatar(authUtils.getCurrentUserId(), avatar));
     }

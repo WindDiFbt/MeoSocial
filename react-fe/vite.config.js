@@ -7,4 +7,14 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
+  resolve: {
+    alias: {
+      '@': '/src',
+      '@components': '/src/components',
+      '@utils': '/src/utils',
+      '@redux': '/src/redux',
+      '@services': '/src/services',
+      '@assets': '/src/assets'
+    }
+  },
 })
