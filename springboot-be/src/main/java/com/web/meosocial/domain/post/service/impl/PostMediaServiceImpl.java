@@ -105,4 +105,10 @@ public class PostMediaServiceImpl implements PostMediaService {
     public void deletePostMediaOfPost(String postId) {
         postMediaRepository.updateIsDeleteAndDeletedAtByPostId(postId, true, LocalDateTime.now());
     }
+
+    @Override
+    public ApiResponse<List<PostMediaDto>> getAllPostMediaOfUser(Long userId) {
+        return apiResponseUtils.success(postMediaRepository.findAllNotDeletedByUserId(userId).stream()
+                .map(PostMediaDto::new).collect(Collectors.toList()), "Get All Post Media of User Id " + userId + " successfully!");
+    }
 }

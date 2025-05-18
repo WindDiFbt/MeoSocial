@@ -17,5 +17,7 @@ public interface PostMediaService {
 
     void deletePostMediaOfPost(String postId);
 
+    ApiResponse<List<PostMediaDto>> getAllPostMediaOfUser(Long userId);
+
     PostMediaDto updatePostMedia(PostMediaDto postMediaDto);
 }

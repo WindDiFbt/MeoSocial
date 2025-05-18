@@ -20,14 +20,12 @@ export default function Posts() {
                 setLoading(false);
             }
         };
-
         fetchPosts();
     }, []);
 
     if (loading) {
         return <p className="text-center">Loading posts...</p>;
     }
-
     return (
         <div>
             {posts.length === 0 ? (
@@ -70,7 +68,6 @@ export default function Posts() {
                                 ))}
                             </div>
                         )}
-
                         <div className="flex justify-between items-center mt-4 text-gray-600">
                             <button className="flex items-center space-x-1 hover:text-red-500">
                                 <Heart size={20} />

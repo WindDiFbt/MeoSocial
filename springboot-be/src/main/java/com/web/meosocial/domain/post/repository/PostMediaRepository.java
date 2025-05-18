@@ -18,4 +18,9 @@ public interface PostMediaRepository extends JpaRepository<PostMedia, String> {
     @Modifying
     @Query("UPDATE PostMedia pm SET pm.isDelete = :isDelete, pm.deletedAt = :deletedAt WHERE pm.post.id = :postId AND pm.isDelete = false")
     void updateIsDeleteAndDeletedAtByPostId(@Param("postId") String postId, @Param("isDelete") boolean isDelete, @Param("deletedAt") LocalDateTime deletedAt);
+
+    @Query("SELECT pm FROM PostMedia pm " +
+            "JOIN pm.post p " +
+            "WHERE pm.isDelete = false AND p.user.id = :userId")
+    List<PostMedia> findAllNotDeletedByUserId(@Param("userId") Long userId);
 }
