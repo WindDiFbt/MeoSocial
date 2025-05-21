@@ -20,14 +20,12 @@ export default function Posts() {
                 setLoading(false);
             }
         };
-
         fetchPosts();
     }, []);
 
     if (loading) {
         return <p className="text-center">Loading posts...</p>;
     }
-
     return (
         <div>
             {posts.length === 0 ? (
@@ -37,7 +35,7 @@ export default function Posts() {
                     <div key={post.id} className="bg-white rounded-lg shadow-md p-4 my-4">
                         <div className="flex items-start space-x-3">
                             <img
-                                src={post.userAvatar || "../../../default-avatar.jpg"}
+                                src={post?.postOwnerAvatarUrl || "../../../default-avatar.jpg"}
                                 alt="Avatar"
                                 className="w-10 h-10 rounded-full"
                             />
@@ -70,7 +68,6 @@ export default function Posts() {
                                 ))}
                             </div>
                         )}
-
                         <div className="flex justify-between items-center mt-4 text-gray-600">
                             <button className="flex items-center space-x-1 hover:text-red-500">
                                 <Heart size={20} />

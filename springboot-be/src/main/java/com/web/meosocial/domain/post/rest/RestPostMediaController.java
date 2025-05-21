@@ -15,6 +15,11 @@ public class RestPostMediaController {
     @Autowired
     private AuthUtils authUtils;
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getAllPostMediaOfUser(@PathVariable Long userId) {
+        return ResponseEntity.ok().body(postMediaService.getAllPostMediaOfUser(userId));
+    }
+
     @PostMapping("/add/{postId}")
     public ResponseEntity<?> addPostMedia(@PathVariable String postId, @RequestParam("file") MultipartFile file) {
         return ResponseEntity.ok().body(postMediaService.createPostMedia(authUtils.getCurrentUserId(), postId, file));

@@ -1,5 +1,6 @@
 package com.web.meosocial.domain.post.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.web.meosocial.domain.post.model.PostMedia;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostMediaDto {
     private String id;
     private String postId;

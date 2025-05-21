@@ -26,6 +26,7 @@ public class PostDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
+    private String postOwnerAvatarUrl;
 
     private List<PostMediaDto> media;
 
@@ -48,6 +49,7 @@ public class PostDto {
             if (post.getPostmedia() != null) {
                 this.media = post.getPostmedia().stream().map(PostMediaDto::new).collect(Collectors.toList());
             }
+            this.postOwnerAvatarUrl = post.getUser().getUserinfo().getAvatarUrl();
         }
     }
 }
