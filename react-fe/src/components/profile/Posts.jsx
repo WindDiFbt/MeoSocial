@@ -35,7 +35,7 @@ export default function Posts() {
                     <div key={post.id} className="bg-white rounded-lg shadow-md p-4 my-4">
                         <div className="flex items-start space-x-3">
                             <img
-                                src={post.userAvatar || "../../../default-avatar.jpg"}
+                                src={post?.postOwnerAvatarUrl || "../../../default-avatar.jpg"}
                                 alt="Avatar"
                                 className="w-10 h-10 rounded-full"
                             />
