@@ -5,10 +5,11 @@ import Modal from "react-modal";
 import { logout as logoutAction } from "../../redux/slices/AuthSlice";
 import { getUserInfo } from "../../services/APIService";
 import { toast } from 'react-toastify';
-
+import './Home_SidebarL.css';
+import CreateNewPost from './CreateNewPost';
 import {
   Home, Calendar, Ticket, Megaphone, Settings, BadgePlus, HelpCircle, Sparkles, ChevronUp, ChevronDown,
-  User, LogOut, Video, X, Image, Tag, ImagePlay, SmilePlus, Ellipsis, Globe, Footprints, UserRound, Lock,
+  User, LogOut, Video
 } from 'lucide-react';
 
 Modal.setAppElement("#root");
@@ -20,10 +21,6 @@ export default function Home_SidebarL() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
-  const [postContent, setPostContent] = useState("");
-  const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const isPostButtonEnabled = postContent.trim() !== "" || uploadedFiles.length > 0;
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
@@ -62,20 +59,7 @@ export default function Home_SidebarL() {
   };
 
   const openModal = () => setIsModalOpen(true);
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setPostContent("");
-    setUploadedFiles([]);
-  };
-
-  const handlePostContentChange = (e) => {
-    setPostContent(e.target.value);
-  };
-
-  const handleFileUpload = (e) => {
-    const files = Array.from(e.target.files);
-    setUploadedFiles((prevFiles) => [...prevFiles, ...files]);
-  };
+  const closeModal = () => setIsModalOpen(false);
 
   return (
     <>
@@ -136,116 +120,7 @@ export default function Home_SidebarL() {
           </div>
         </div>
       </aside>
-
-      <Modal
-        isOpen={isModalOpen}
-        onRequestClose={closeModal}
-        contentLabel="Tạo bài viết"
-        className="fixed inset-0 flex items-center justify-center z-50"
-        overlayClassName="fixed inset-0 backdrop-blur-xs"
-      >
-        <div className="bg-white rounded-lg w-full max-w-xl shadow-xl">
-          <div className="flex justify-between items-center px-4 py-3 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-800">New post</h2>
-            <button
-              onClick={closeModal}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <X size={24} />
-            </button>
-          </div>
-          <div className="px-4 py-3">
-            <div className="flex items-center gap-3 mb-4">
-              <img
-                src={user?.avatarUrl || "/default-avatar.jpg"}
-                alt={user?.fullName || "User Avatar"}
-                className="w-10 h-10 rounded-full object-cover"
-              />
-              <div>
-                <p className="font-semibold text-gray-800">{user?.fullName}</p>
-                <div className="relative inline-block text-left pt-1">
-                  <button
-                    onClick={() => setShowDropdown(!showDropdown)}
-                    className="text-xs text-gray-500 border rounded px-2 py-0.5 hover:bg-gray-100 flex items-center gap-1"
-                  >
-                    <div className='flex items-center gap-1'>
-                      <Globe className='h-4 w-4'></Globe>Public
-                      <ChevronDown className="h-4 w-4 text-gray-500" />
-                    </div>
-                  </button>
-
-                  {showDropdown && (
-                    <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
-                      <ul className="text-sm text-gray-700">
-                        <li className="px-4 flex py-2 gap-2 hover:bg-gray-100 cursor-pointer"><Globe className='h-5 w-5'></Globe>Public</li>
-                        <li className="px-4 flex py-2 gap-2 hover:bg-gray-100 cursor-pointer"><Footprints className='h-5 w-5'></Footprints>Followers</li>
-                        <li className="px-4 flex py-2 gap-2 hover:bg-gray-100 cursor-pointer"><UserRound className='h-5 w-5'></UserRound>Friends</li>
-                        <li className="px-4 flex py-2 gap-2 hover:bg-gray-100 cursor-pointer"><Lock className='h-5 w-5'></Lock>Private</li>
-                      </ul>
-                    </div>
-                  )}
-                </div>
-
-              </div>
-            </div>
-
-            <textarea
-              className="w-full text-lg text-gray-800 placeholder-gray-500 focus:outline-none resize-none"
-              placeholder="What's on your mind?"
-              rows={5}
-              value={postContent}
-              onChange={handlePostContentChange}
-            />
-
-            <div>
-              <div className="flex justify-end gap-4 mt-4">
-                <label className="items-center gap cursor-pointer" title='Upload images/videos'>
-                  <input
-                    type="file"
-                    multiple
-                    className="hidden"
-                    onChange={handleFileUpload}
-                  />
-                  <Image className="h-6 w-6"></Image>
-                </label>
-                <label className="items-center gap-2 cursor-pointer" title='Tag others'>
-                  <input className="hidden" />
-                  <Tag className="h-6 w-6 text-blue-400"></Tag>
-                </label>
-                <label className="items-center gap-2 cursor-pointer" title='Feelings/Activities'>
-                  <input className="hidden" />
-                  <SmilePlus className="h-6 w-6"></SmilePlus>
-                </label>
-                <label className="items-center gap-2 cursor-pointer" title='GIF'>
-                  <input className="hidden" />
-                  <ImagePlay className="h-6 w-6"></ImagePlay>
-                </label>
-                <label className="items-center gap-2 cursor-pointer" title='GIF'>
-                  <input className="hidden" />
-                  <Ellipsis className="h-6 w-6"></Ellipsis>
-                </label>
-              </div>
-            </div>
-            {uploadedFiles.length > 0 && (
-              <div className="mt-2 text-sm text-gray-600">
-                {uploadedFiles.map((file, index) => (
-                  <p key={index}>{file.name}</p>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="border-t border-gray-200 px-4 py-3">
-            <button
-              className={`w-full bg-blue-500 text-white font-semibold py-2 rounded-lg hover:bg-blue-600 ${!isPostButtonEnabled ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              disabled={!isPostButtonEnabled}
-            >
-              Post
-            </button>
-          </div>
-        </div>
-      </Modal>
+      <CreateNewPost isOpen={isModalOpen} onClose={closeModal} user={user} />
     </>
   );
 }
