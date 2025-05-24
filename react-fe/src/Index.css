@@ -9,3 +9,7 @@ html {
 .Toastify__toast {
   font-size: 14px;
 }
+
+#nprogress .spinner {
+  display: none;
+}

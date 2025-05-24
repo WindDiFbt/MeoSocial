@@ -24,8 +24,8 @@ export const getUserPostMedia = (userId) => {
     return axios.get(`/post-media/user/${userId}`);
 }
 
-export const createPost = (content) => {
-    return axios.post(`/post/new`, { content });
+export const createPost = (content, visibilityLevel) => {
+    return axios.post(`/post/new`, { content, visibilityLevel });
 }
 
 export const createPostMedia = (postId, file) => {

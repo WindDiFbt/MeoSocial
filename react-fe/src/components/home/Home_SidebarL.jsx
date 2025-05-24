@@ -5,7 +5,6 @@ import Modal from "react-modal";
 import { logout as logoutAction } from "../../redux/slices/AuthSlice";
 import { getUserInfo } from "../../services/APIService";
 import { toast } from 'react-toastify';
-import './Home_SidebarL.css';
 import CreateNewPost from './CreateNewPost';
 import {
   Home, Calendar, Ticket, Megaphone, Settings, BadgePlus, HelpCircle, Sparkles, ChevronUp, ChevronDown,
@@ -65,21 +64,21 @@ export default function Home_SidebarL() {
     <>
       <aside className="flex h-full w-64 flex-col justify-between border-r border-gray-200 p-4 fixed pt-20">
         <div>
-          <div className="space-y-1">
+          <div className="space-y-1 pt-2">
             <SidebarItem icon={<Home className="h-4 w-4" />} label="Home" to="/home" />
             <SidebarItem icon={<Calendar className="h-4 w-4" />} label="Events" to="#" />
-            <SidebarItem icon={<Ticket className="h-4 w-4" />} label="Orders" />
-            <SidebarItem icon={<Megaphone className="h-4 w-4" />} label="Broadcasts" />
+            <SidebarItem icon={<Ticket className="h-4 w-4" />} label="Orders" to="#" />
+            <SidebarItem icon={<Megaphone className="h-4 w-4" />} label="Broadcasts" to="#" />
             <hr className="border-gray-200 my-4" />
             <SidebarItem
               icon={<BadgePlus className="h-4 w-4" />}
               label="New Post"
               onClick={openModal}
             />
-            <SidebarItem icon={<Video className="h-4 w-4" />} label="Livestream" />
+            <SidebarItem icon={<Video className="h-4 w-4" />} label="Livestream" to="#"/>
             <hr className="border-gray-200 my-4" />
-            <SidebarItem icon={<HelpCircle className="h-4 w-4" />} label="Support" />
-            <SidebarItem icon={<Sparkles className="h-4 w-4" />} label="Changelog" />
+            <SidebarItem icon={<HelpCircle className="h-4 w-4" />} label="Support" to="#"/>
+            <SidebarItem icon={<Sparkles className="h-4 w-4" />} label="Changelog" to="#"/>
           </div>
         </div>
 
@@ -129,7 +128,7 @@ function SidebarItem({ icon, label, to, onClick }) {
   return to ? (
     <Link
       to={to}
-      className="flex items-center gap-3 rounded px-3 py-2 text-base font-medium hover:bg-gray-200 hover:shadow-lg transition cursor-pointer"
+      className="flex w-full items-center gap-3 rounded px-3 py-2 text-base font-medium hover:bg-gray-200 hover:shadow-lg transition cursor-pointer"
     >
       <span className="text-gray-500">{icon}</span>
       <span>{label}</span>
@@ -137,7 +136,7 @@ function SidebarItem({ icon, label, to, onClick }) {
   ) : (
     <button
       onClick={onClick}
-      className="flex items-center gap-3 rounded px-3 py-2 text-base font-medium hover:bg-gray-200 hover:shadow-lg transition cursor-pointer"
+      className="flex w-full items-center gap-3 rounded px-3 py-2 text-base font-medium hover:bg-gray-200 hover:shadow-lg transition cursor-pointer"
     >
       <span className="text-gray-500">{icon}</span>
       <span>{label}</span>

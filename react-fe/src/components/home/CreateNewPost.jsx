@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import Modal from "react-modal";
 import { toast } from 'react-toastify';
-import './Home_SidebarL.css';
+import './CreateNewPost.css';
 import { createPost, createPostMedia } from "../../services/APIService";
 import {
     ChevronDown, X, Image, Tag, ImagePlay, SmilePlus, Ellipsis, Globe, Footprints, UserRound, Lock,
@@ -15,6 +15,8 @@ export default function CreateNewPost({ isOpen, onClose, user }) {
     const [showDropdown, setShowDropdown] = useState(false);
     const carouselRef = useRef(null);
     const isPostButtonEnabled = postContent.trim() !== "" || uploadedFiles.length > 0;
+    const [visibilityLevel, setVisibilityLevel] = useState(1);
+    const [isPosting, setIsPosting] = useState(false);
 
     const handlePostContentChange = (e) => {
         setPostContent(e.target.value);
@@ -23,6 +25,7 @@ export default function CreateNewPost({ isOpen, onClose, user }) {
     const handleCloseModal = () => {
         setFilePreviews([]);
         setUploadedFiles([]);
+        setPostContent("");
         onClose();
     };
 
@@ -66,8 +69,10 @@ export default function CreateNewPost({ isOpen, onClose, user }) {
     };
 
     const handleCreateNewPost = async () => {
+        if (isPosting) return;
+        setIsPosting(true);
         try {
-            const response = await createPost(postContent);
+            const response = await createPost(postContent, visibilityLevel);
             const postId = response?.data?.response.id;
             if (!postId) {
                 throw new Error('Failed to create post. No post ID returned.');
@@ -81,6 +86,8 @@ export default function CreateNewPost({ isOpen, onClose, user }) {
         } catch (error) {
             console.error('Error creating post:', error);
             toast.error('Failed to create post. Please try again.');
+        } finally {
+            setIsPosting(false);
         }
     };
 
@@ -114,10 +121,17 @@ export default function CreateNewPost({ isOpen, onClose, user }) {
                             <div className="relative inline-block text-left pt-1">
                                 <button
                                     onClick={() => setShowDropdown(!showDropdown)}
-                                    className="text-xs text-gray-500 border rounded px-2 py-0.5 hover:bg-gray-100 flex items-center gap-1"
+                                    className="text-xs text-gray-500 border rounded px-2 py-0.5 hover:bg-gray-100 flex items-center gap-1 w-full justify-between"
                                 >
-                                    <div className='flex items-center gap-1'>
-                                        <Globe className='h-4 w-4'></Globe>Public
+                                    <div className="flex items-center gap-1">
+                                        {visibilityLevel === 1 && <Globe className="h-4 w-4" />}
+                                        {visibilityLevel === 2 && <Footprints className="h-4 w-4" />}
+                                        {visibilityLevel === 3 && <UserRound className="h-4 w-4" />}
+                                        {visibilityLevel === 4 && <Lock className="h-4 w-4" />}
+                                        {visibilityLevel === 1 && "Public"}
+                                        {visibilityLevel === 2 && "Followers"}
+                                        {visibilityLevel === 3 && "Friends"}
+                                        {visibilityLevel === 4 && "Private"}
                                         <ChevronDown className="h-4 w-4 text-gray-500" />
                                     </div>
                                 </button>
@@ -125,10 +139,42 @@ export default function CreateNewPost({ isOpen, onClose, user }) {
                                 {showDropdown && (
                                     <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
                                         <ul className="text-sm text-gray-700">
-                                            <li className="px-4 flex py-2 gap-2 hover:bg-gray-100 cursor-pointer"><Globe className='h-5 w-5'></Globe>Public</li>
-                                            <li className="px-4 flex py-2 gap-2 hover:bg-gray-100 cursor-pointer"><Footprints className='h-5 w-5'></Footprints>Followers</li>
-                                            <li className="px-4 flex py-2 gap-2 hover:bg-gray-100 cursor-pointer"><UserRound className='h-5 w-5'></UserRound>Friends</li>
-                                            <li className="px-4 flex py-2 gap-2 hover:bg-gray-100 cursor-pointer"><Lock className='h-5 w-5'></Lock>Private</li>
+                                            <li
+                                                className="px-4 flex py-2 gap-2 hover:bg-gray-100 cursor-pointer"
+                                                onClick={() => {
+                                                    setVisibilityLevel(1);
+                                                    setShowDropdown(false);
+                                                }}
+                                            >
+                                                <Globe className="h-5 w-5" /> Public
+                                            </li>
+                                            <li
+                                                className="px-4 flex py-2 gap-2 hover:bg-gray-100 cursor-pointer"
+                                                onClick={() => {
+                                                    setVisibilityLevel(2);
+                                                    setShowDropdown(false);
+                                                }}
+                                            >
+                                                <Footprints className="h-5 w-5" /> Followers
+                                            </li>
+                                            <li
+                                                className="px-4 flex py-2 gap-2 hover:bg-gray-100 cursor-pointer"
+                                                onClick={() => {
+                                                    setVisibilityLevel(3);
+                                                    setShowDropdown(false);
+                                                }}
+                                            >
+                                                <UserRound className="h-5 w-5" /> Friends
+                                            </li>
+                                            <li
+                                                className="px-4 flex py-2 gap-2 hover:bg-gray-100 cursor-pointer"
+                                                onClick={() => {
+                                                    setVisibilityLevel(4);
+                                                    setShowDropdown(false);
+                                                }}
+                                            >
+                                                <Lock className="h-5 w-5" /> Private
+                                            </li>
                                         </ul>
                                     </div>
                                 )}
@@ -153,7 +199,7 @@ export default function CreateNewPost({ isOpen, onClose, user }) {
                                     className="hidden"
                                     onChange={handleFileUpload}
                                 />
-                                <Image className="h-6 w-6"></Image>
+                                <Image className="h-6 w-6 text-green-400"></Image>
                             </label>
                             <label className="items-center gap-2 cursor-pointer" title='Tag others'>
                                 <input className="hidden" />
@@ -161,13 +207,13 @@ export default function CreateNewPost({ isOpen, onClose, user }) {
                             </label>
                             <label className="items-center gap-2 cursor-pointer" title='Feelings/Activities'>
                                 <input className="hidden" />
-                                <SmilePlus className="h-6 w-6"></SmilePlus>
+                                <SmilePlus className="h-6 w-6 text-orange-400"></SmilePlus>
                             </label>
                             <label className="items-center gap-2 cursor-pointer" title='GIF'>
                                 <input className="hidden" />
-                                <ImagePlay className="h-6 w-6"></ImagePlay>
+                                <ImagePlay className="h-6 w-6 text-purple-400"></ImagePlay>
                             </label>
-                            <label className="items-center gap-2 cursor-pointer" title='GIF'>
+                            <label className="items-center gap-2 cursor-pointer" title='Other'>
                                 <input className="hidden" />
                                 <Ellipsis className="h-6 w-6"></Ellipsis>
                             </label>
@@ -231,9 +277,9 @@ export default function CreateNewPost({ isOpen, onClose, user }) {
                         onClick={handleCreateNewPost}
                         className={`w-full bg-blue-500 text-white font-semibold py-2 rounded-lg hover:bg-blue-600 ${!isPostButtonEnabled ? "opacity-50 cursor-not-allowed" : ""
                             }`}
-                        disabled={!isPostButtonEnabled}
+                        disabled={!isPostButtonEnabled || isPosting}
                     >
-                        Post
+                        {isPosting ? "Posting..." : "Post"}
                     </button>
                 </div>
             </div>
