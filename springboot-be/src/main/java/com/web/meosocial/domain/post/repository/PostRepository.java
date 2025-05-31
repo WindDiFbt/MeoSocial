@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, String> {
-    @Query("SELECT p FROM Post p WHERE p.isDelete = FALSE AND p.user.id = :userId")
+    @Query("SELECT p FROM Post p WHERE p.isDelete = FALSE AND p.user.id = :userId ORDER BY p.createdAt DESC")
     List<Post> findAllByUserId(@Param("userId") Long userId);
 
     @Query("SELECT p FROM Post  p WHERE p.sharedPostId = :postId")

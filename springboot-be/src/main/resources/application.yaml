@@ -11,14 +11,14 @@ spring:
     redis:
       repositories:
         enabled: 'false'
-      host: ${DEV_ENV_REDIS_HOST}
-      port: ${DEV_ENV_REDIS_PORT}
-#      password: ${REDIS_PASSWORD}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
       timeout: 60s
   datasource:
-    url: ${DEV_ENV_MYSQL_DATABASE_URL}
-    username: ${MYSQL_USER}
-    password: ${DEV_ENV_MYSQL_PASSWORD}
+    url: ${RW_MYSQL_DATABASE_URL}
+    username: ${RW_MYSQL_DATABASE_NAME}
+    password: ${RW_MYSQL_ROOT_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:

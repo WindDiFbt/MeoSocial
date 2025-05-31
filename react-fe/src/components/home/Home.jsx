@@ -1,47 +1,50 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchHomePostsStart, fetchHomePostsSuccess, fetchPostsFailure } from "../../redux/slices/PostSlice";
 import Header from "../shared/Header";
 import Home_SidebarL from "./Home_SidebarL";
 import { Heart, MessageCircle, Share } from "lucide-react";
 import { getPost } from "../../services/APIService";
 import formatDate from "../../utils/DateUtil";
+import {
+    Globe, Footprints, UserRound, Lock,
+} from 'lucide-react';
 
-const Post = () => {
-    const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+export default function Home() {
+    const dispatch = useDispatch();
+    const { homePosts, isLoading } = useSelector((state) => state.posts);
+
     useEffect(() => {
         const fetchPosts = async () => {
             try {
+                dispatch(fetchHomePostsStart());
                 const response = await getPost();
                 if (response?.data?.response) {
-                    setPosts(response.data.response);
+                    dispatch(fetchHomePostsSuccess(response.data.response));
                 } else {
-                    setError("Invalid API data!");
+                    dispatch(fetchPostsFailure("Invalid API data!"));
                 }
             } catch (error) {
-                console.error("Error when calling API: ", error);
-                setError(error.message || "Unknown error");
-            } finally {
-                setLoading(false);
+                dispatch(fetchPostsFailure(error.message || "Unknown error"));
             }
         };
         fetchPosts();
-    }, []);
-    return { posts, loading, error };
-}
+    }, [dispatch]);
 
-export default function Home() {
-    const { posts, loading, error } = Post();
+    if (isLoading) {
+        return <p className="text-center">Loading posts...</p>;
+    }
+
     return (
         <div>
             <div className="bg-gray-100 min-h-screen">
                 <Header />
                 <Home_SidebarL />
                 <div className="pt-20 max-w-2xl mx-auto">
-                    {posts.length === 0 ? (
-                        <p className="text-center text-gray-500">Chưa có bài viết nào.</p>
+                    {(!homePosts || homePosts.length === 0) ? (
+                        <p className="text-center text-gray-500">No post yet.</p>
                     ) : (
-                        posts.map((post) => (
+                        homePosts.map((post) => (
                             <div key={post.id} className="bg-white rounded-lg shadow-md p-4 my-4">
                                 <div className="flex items-start space-x-3">
                                     <img
@@ -55,11 +58,14 @@ export default function Home() {
                                             <span>@{post.userName}</span>
                                             <span>•</span>
                                             <span>{formatDate(post.createdAt)}</span>
+                                            <label className="items-center gap-2" title={getVisibilityLabel(post.visibilityLevel).label}>
+                                                {getVisibilityLabel(post.visibilityLevel).icon}
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
                                 <p className="mt-3">{post.content}</p>
-                                {post.media.length > 0 && (
+                                {post.media && post.media.length > 0 && (
                                     <div className="mt-3 grid grid-cols-2 gap-2">
                                         {post.media.map((media) => (
                                             <div key={media.id} className="media">
@@ -82,15 +88,15 @@ export default function Home() {
                                 <div className="flex justify-between items-center mt-4 text-gray-600">
                                     <button className="flex items-center space-x-1 hover:text-red-500">
                                         <Heart size={20} />
-                                        <span>Thích</span>
+                                        <span className="text-sm">Like</span>
                                     </button>
                                     <button className="flex items-center space-x-1 hover:text-blue-500">
                                         <MessageCircle size={20} />
-                                        <span>Bình luận</span>
+                                        <span className="text-sm">Comments</span>
                                     </button>
                                     <button className="flex items-center space-x-1 hover:text-green-500">
                                         <Share size={20} />
-                                        <span>Chia sẻ</span>
+                                        <span className="text-sm">Share</span>
                                     </button>
                                 </div>
                             </div>
@@ -101,3 +107,18 @@ export default function Home() {
         </div>
     );
 }
+
+const getVisibilityLabel = (level) => {
+    switch (level) {
+        case 1:
+            return { label: "Public", icon: <Globe className="h-4 w-4" /> };
+        case 2:
+            return { label: "Followers", icon: <Footprints className="h-4 w-4" /> };
+        case 3:
+            return { label: "Friends", icon: <UserRound className="h-4 w-4" /> };
+        case 4:
+            return { label: "Private", icon: <Lock className="h-4 w-4" /> };
+        default:
+            return { label: "Unknown", icon: null };
+    }
+};

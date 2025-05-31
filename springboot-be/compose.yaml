@@ -3,6 +3,8 @@ services:
   server:
     build: .
     restart: always
+    env_file:
+      - .env
     ports:
       - "8080:8080"
     environment:
@@ -23,3 +25,27 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
       REFRESH_TOKEN_EXPIRATION_MS: ${REFRESH_TOKEN_EXPIRATION_MS}
+
+#  mysql:
+#    image: mysql:8.0
+#    restart: always
+#    environment:
+#      MYSQL_ROOT_PASSWORD: ${DEV_ENV_MYSQL_PASSWORD}
+#      MYSQL_DATABASE: ${DEV_MYSQL_DATABASE_NAME}
+#      MYSQL_PASSWORD: ${DEV_ENV_MYSQL_PASSWORD}
+#    ports:
+#      - "3307:3306"
+#    volumes:
+#      - mysql_data:/var/lib/mysql
+#
+#  redis:
+#    image: redis:7.0-alpine
+#    restart: always
+#    ports:
+#      - "6379:6379"
+#    volumes:
+#      - redis_data:/data
+#
+#volumes:
+#  mysql_data:
+#  redis_data:

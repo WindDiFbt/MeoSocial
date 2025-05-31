@@ -1,37 +1,56 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProfilePostsStart, fetchProfilePostsSuccess, fetchPostsFailure } from "../../redux/slices/PostSlice";
 import { getPost } from "../../services/APIService";
 import { Heart, MessageCircle, Share } from "lucide-react";
 import formatDate from "../../utils/DateUtil";
+import {
+    Globe, Footprints, UserRound, Lock,
+} from 'lucide-react';
 
 export default function Posts() {
-    const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const dispatch = useDispatch();
+    const { profilePosts, isLoading } = useSelector((state) => state.posts);
 
     useEffect(() => {
         const fetchPosts = async () => {
             try {
+                dispatch(fetchProfilePostsStart());
                 const response = await getPost();
                 if (response?.data?.response) {
-                    setPosts(response.data.response);
+                    dispatch(fetchProfilePostsSuccess(response.data.response));
                 }
             } catch (error) {
-                console.error("Error fetching posts:", error);
-            } finally {
-                setLoading(false);
+                dispatch(fetchPostsFailure(error.message || "Unknown error"));
             }
         };
         fetchPosts();
-    }, []);
+    }, [dispatch]);
 
-    if (loading) {
+    const getVisibilityLabel = (level) => {
+        switch (level) {
+            case 1:
+                return { label: "Public", icon: <Globe className="h-4 w-4" /> };
+            case 2:
+                return { label: "Followers", icon: <Footprints className="h-4 w-4" /> };
+            case 3:
+                return { label: "Friends", icon: <UserRound className="h-4 w-4" /> };
+            case 4:
+                return { label: "Private", icon: <Lock className="h-4 w-4" /> };
+            default:
+                return { label: "Unknown", icon: null };
+        }
+    };
+
+    if (isLoading) {
         return <p className="text-center">Loading posts...</p>;
     }
     return (
         <div>
-            {posts.length === 0 ? (
-                <p className="text-center text-gray-500">Chưa có bài viết nào.</p>
+            {(!profilePosts || profilePosts.length === 0) ? (
+                <p className="text-center text-gray-500">No posts yet.</p>
             ) : (
-                posts.map((post) => (
+                profilePosts.map((post) => (
                     <div key={post.id} className="bg-white rounded-lg shadow-md p-4 my-4">
                         <div className="flex items-start space-x-3">
                             <img
@@ -45,11 +64,14 @@ export default function Posts() {
                                     <span>@{post.userName}</span>
                                     <span>•</span>
                                     <span>{formatDate(post.createdAt)}</span>
+                                    <label className="items-center gap-2" title={getVisibilityLabel(post.visibilityLevel).label}>
+                                        {getVisibilityLabel(post.visibilityLevel).icon}
+                                    </label>
                                 </div>
                             </div>
                         </div>
                         <p className="mt-3">{post.content}</p>
-                        {post.media.length > 0 && (
+                        {post.media && post.media.length > 0 && (
                             <div className="mt-3 grid grid-cols-2 gap-2">
                                 {post.media.map((media) => (
                                     <div key={media.id} className="media">
@@ -71,15 +93,15 @@ export default function Posts() {
                         <div className="flex justify-between items-center mt-4 text-gray-600">
                             <button className="flex items-center space-x-1 hover:text-red-500">
                                 <Heart size={20} />
-                                <span>Thích</span>
+                                <span className="text-sm">Like</span>
                             </button>
                             <button className="flex items-center space-x-1 hover:text-blue-500">
                                 <MessageCircle size={20} />
-                                <span>Bình luận</span>
+                                <span className="text-sm">Comments</span>
                             </button>
                             <button className="flex items-center space-x-1 hover:text-green-500">
                                 <Share size={20} />
-                                <span>Chia sẻ</span>
+                                <span className="text-sm">Share</span>
                             </button>
                         </div>
                     </div>

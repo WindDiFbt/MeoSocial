@@ -27,7 +27,6 @@ export default function Header() {
 
     return (
         <header className="flex items-center justify-between bg-white p-4 shadow-md fixed w-full top-0 z-50">
-            {/* Logo */}
             <div className="pl-2 flex items-center gap-2">
                 <img
                     src="/meosocial_logo.png"
@@ -37,7 +36,6 @@ export default function Header() {
                 <span className="text-xl font-bold">MeoSocial</span>
             </div>
 
-            {/* Search area */}
             <div className="relative pl-9 flex-1 flex">
                 <div className="w-100 h-11">
                     <div
@@ -61,7 +59,6 @@ export default function Header() {
                 </div>
             </div>
 
-            {/* Icons */}
             <div className="flex space-x-6">
                 <button className="p-2 hover:bg-gray-100 rounded-full">
                     <Bell className="text-gray-600" size={24} />

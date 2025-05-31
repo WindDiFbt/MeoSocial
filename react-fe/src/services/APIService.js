@@ -23,3 +23,17 @@ export const getUserInfo = () => {
 export const getUserPostMedia = (userId) => {
     return axios.get(`/post-media/user/${userId}`);
 }
+
+export const createPost = (content, visibilityLevel) => {
+    return axios.post(`/post/new`, { content, visibilityLevel });
+}
+
+export const createPostMedia = (postId, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return axios.post(`/post-media/add/${postId}`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+}   
