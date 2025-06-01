@@ -7,18 +7,30 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: 'true'
+          starttls:
+            enable: 'true'
+
   data:
     redis:
       repositories:
         enabled: 'false'
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD}
+      host: ${DEV_ENV_REDIS_HOST}
+      port: ${DEV_ENV_REDIS_PORT}
+      #      password: ${REDIS_PASSWORD}
       timeout: 60s
   datasource:
-    url: ${RW_MYSQL_DATABASE_URL}
-    username: ${RW_MYSQL_DATABASE_NAME}
-    password: ${RW_MYSQL_ROOT_PASSWORD}
+    url: ${DEV_ENV_MYSQL_DATABASE_URL}
+    username: ${MYSQL_USER}
+    password: ${DEV_ENV_MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -31,3 +43,4 @@ app:
   jwtSecretKey: ${JWT_SECRET_KEY}
   jwtExpirationMs: ${JWT_EXPIRATION_MS}
   jwtRefreshExpirationMs: ${REFRESH_TOKEN_EXPIRATION_MS}
+  mailFrom: ${MAIL_USERNAME}

@@ -1,6 +1,6 @@
 package com.web.meosocial.domain.comment.service.impl;
 
-import com.web.meosocial.cloudinary.CloudinaryService;
+import com.web.meosocial.domain.cloudinary.CloudinaryService;
 import com.web.meosocial.constant.Enums;
 import com.web.meosocial.domain.comment.dto.CommentMediaDto;
 import com.web.meosocial.domain.comment.model.Comment;

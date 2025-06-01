@@ -4,7 +4,6 @@ import com.web.meosocial.auth.models.RefreshToken;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Service;
 
-@Service
 public interface RefreshTokenService {
     RefreshToken createRefreshToken(Long userId, String ipDevice);
 

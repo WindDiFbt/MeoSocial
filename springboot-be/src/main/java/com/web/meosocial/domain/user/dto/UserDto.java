@@ -12,6 +12,7 @@ public class UserDto {
     private Long id;
     private String userName;
     private String password;
+    private String email;
     private Integer userStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -21,6 +22,7 @@ public class UserDto {
             this.id = user.getId();
             this.userName = user.getUserName();
             this.password = user.getPassword();
+            this.email = user.getEmail();
             this.userStatus = user.getUserStatus();
             this.createdAt = user.getCreatedAt();
             this.updatedAt = user.getUpdatedAt();

@@ -1,6 +1,6 @@
 package com.web.meosocial.domain.user.service.impl;
 
-import com.web.meosocial.cloudinary.CloudinaryService;
+import com.web.meosocial.domain.cloudinary.CloudinaryService;
 import com.web.meosocial.constant.Enums;
 import com.web.meosocial.domain.user.dto.UserInfoDto;
 import com.web.meosocial.domain.user.model.User;
