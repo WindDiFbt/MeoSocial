@@ -20,5 +20,7 @@ public interface UserService {
 
     boolean existsByUserName(String username);
 
+    boolean existsByEmail(String email);
+
     void saveUser(User user);
 }

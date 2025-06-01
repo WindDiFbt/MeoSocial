@@ -11,7 +11,6 @@ import java.time.LocalDate;
 public class UserInfoDto {
     private Long id;
     private String fullName;
-    private String email;
     private String phoneNumber;
     private String avatarUrl;
     private String interestedUser;
@@ -26,7 +25,6 @@ public class UserInfoDto {
         if (userInfo != null) {
             this.id = userInfo.getId();
             this.fullName = userInfo.getFullName();
-            this.email = userInfo.getEmail();
             this.phoneNumber = userInfo.getPhoneNumber();
             this.avatarUrl = userInfo.getAvatarUrl();
             this.interestedUser = userInfo.getInterestedUser();

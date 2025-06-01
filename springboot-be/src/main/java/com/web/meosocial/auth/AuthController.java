@@ -6,6 +6,7 @@ import com.web.meosocial.exception.UserAlreadyExistsException;
 import com.web.meosocial.payload.request.LoginRequest;
 import com.web.meosocial.payload.request.RefreshTokenRequest;
 import com.web.meosocial.payload.request.RegisterRequest;
+import com.web.meosocial.payload.request.VerifyRequest;
 import com.web.meosocial.payload.response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,8 +31,14 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<?>> register(@RequestBody @Valid RegisterRequest registerRequest)
-            throws RoleNotFoundException, UserAlreadyExistsException {
+            throws UserAlreadyExistsException {
         return authService.register(registerRequest);
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<ApiResponse<?>> verify(@RequestBody @Valid VerifyRequest verifyRequest)
+            throws RoleNotFoundException {
+        return authService.verify(verifyRequest.getEmail(), verifyRequest.getCode());
     }
 
     @PostMapping("/logout")

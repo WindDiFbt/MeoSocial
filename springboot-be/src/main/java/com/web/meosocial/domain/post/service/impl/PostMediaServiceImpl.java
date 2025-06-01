@@ -1,6 +1,6 @@
 package com.web.meosocial.domain.post.service.impl;
 
-import com.web.meosocial.cloudinary.CloudinaryService;
+import com.web.meosocial.domain.cloudinary.CloudinaryService;
 import com.web.meosocial.constant.Enums;
 import com.web.meosocial.domain.post.dto.PostMediaDto;
 import com.web.meosocial.domain.post.model.Post;

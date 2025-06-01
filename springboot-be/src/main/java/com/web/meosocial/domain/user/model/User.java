@@ -31,6 +31,9 @@ public class User {
     @Column(name = "password", length = 64)
     private String password;
 
+    @Column(name= "email", length = 100, unique = true)
+    private String email;
+
     @Lob
     @Column(name = "user_status")
     private Integer userStatus;
@@ -78,6 +81,7 @@ public class User {
             this.id = userDto.getId();
             this.userName = userDto.getUserName();
             this.password = userDto.getPassword();
+            this.email = userDto.getEmail();
             this.userStatus = userDto.getUserStatus();
             this.createdAt = userDto.getCreatedAt();
             this.updatedAt = userDto.getUpdatedAt();

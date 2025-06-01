@@ -24,9 +24,6 @@ public class UserInfo {
     @Column(name = "full_name", length = 127)
     private String fullName;
 
-    @Column(name = "email")
-    private String email;
-
     @Column(name = "phone_number", length = 25)
     private String phoneNumber;
 
@@ -57,7 +54,6 @@ public class UserInfo {
         if (userInfoDto != null) {
             this.id = userInfoDto.getId();
             this.fullName = userInfoDto.getFullName();
-            this.email = userInfoDto.getEmail();
             this.phoneNumber = userInfoDto.getPhoneNumber();
             this.avatarUrl = userInfoDto.getAvatarUrl();
             this.interestedUser = userInfoDto.getInterestedUser();

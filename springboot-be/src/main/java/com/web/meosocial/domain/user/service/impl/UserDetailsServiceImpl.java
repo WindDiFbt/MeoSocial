@@ -31,9 +31,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (usernameOpt.isPresent()) {
             return new UserDetailsImpl(usernameOpt.get());
         }
-        Optional<UserInfo> emailOpt = userInfoRepository.findByEmail(identifier);
+        Optional<User> emailOpt = userRepository.findByEmail(identifier);
         if (emailOpt.isPresent()) {
-            return new UserDetailsImpl(emailOpt.get().getUser());
+            return new UserDetailsImpl(emailOpt.get());
         }
         Optional<UserInfo> phoneOpt = userInfoRepository.findByPhoneNumber(identifier);
         if (phoneOpt.isPresent()) {

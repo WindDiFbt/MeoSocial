@@ -6,6 +6,7 @@ import com.web.meosocial.auth.models.RefreshToken;
 import com.web.meosocial.auth.service.AuthService;
 import com.web.meosocial.auth.service.RedisService;
 import com.web.meosocial.auth.service.RefreshTokenService;
+import com.web.meosocial.auth.service.VerificationService;
 import com.web.meosocial.constant.Enums;
 import com.web.meosocial.domain.user.dto.RoleDto;
 import com.web.meosocial.domain.user.model.Role;
@@ -62,6 +63,8 @@ public class AuthServiceImpl implements AuthService {
     private ApiResponseUtils apiResponseUtils;
     @Autowired
     private AuthUtils authUtils;
+    @Autowired
+    private VerificationService verificationService;
     private final UUID64Generator uuid64Generator = new UUID64Generator();
 
     @Override
@@ -91,16 +94,44 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> register(RegisterRequest registerRequest) throws RoleNotFoundException, UserAlreadyExistsException {
-        if (userService.existsByUserName(registerRequest.getUsername())) {
+    public ResponseEntity<ApiResponse<?>> register(RegisterRequest registerRequest) throws UserAlreadyExistsException {
+        if (registerRequest.getUsername() == null || userService.existsByUserName(registerRequest.getUsername())) {
             throw new UserAlreadyExistsException("User name already exists!");
+        }
+        if (registerRequest.getEmail() == null || userService.existsByEmail(registerRequest.getEmail())) {
+            throw new UserAlreadyExistsException("Email already exists!");
+        }
+
+        redisService.cachePendingRegister(registerRequest);
+        verificationService.sendVerificationCode(registerRequest.getEmail());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                apiResponseUtils.success(null, "Please check your email for verification.")
+        );
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<?>> verify(String email, String code) throws RoleNotFoundException {
+        if (email == null || code == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    apiResponseUtils.error(HttpStatus.BAD_REQUEST, "Email and verification code must not be null!")
+            );
+        }
+        if (!verificationService.verifyCode(email, code)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    apiResponseUtils.error(HttpStatus.BAD_REQUEST, "Invalid verification code!")
+            );
+        }
+        RegisterRequest registerRequest = redisService.getPendingRegister(email);
+        if (registerRequest == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    apiResponseUtils.error(HttpStatus.BAD_REQUEST, "No pending registration found for this email!")
+            );
         }
         User user = createUser(registerRequest);
         userService.saveUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                apiResponseUtils.success(null, "Successfully registered!")
-        );
-
+        redisService.removeCachedVerifyCode(email);
+        return ResponseEntity.ok().body(
+                apiResponseUtils.success(null, "Registration successful!"));
     }
 
     private User createUser(RegisterRequest registerRequest) throws RoleNotFoundException {
@@ -109,11 +140,11 @@ public class AuthServiceImpl implements AuthService {
                 .id(uuid64Generator.generateUUID64())
                 .userName(registerRequest.getUsername())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .email(registerRequest.getEmail())
                 .userStatus(Enums.UserStatus.AVAILABLE.getValue())
                 .createdAt(LocalDateTime.now())
-                .roles(mapRoles(determineRoles(registerRequest.getRoles())))
+                .roles(mapRoles(List.of(roleService.getInstance("user"))))
                 .build();
-
     }
 
     private List<Role> mapRoles(List<RoleDto> roleDtos) {

@@ -1,12 +1,13 @@
 package com.web.meosocial.exception;
 
 import com.web.meosocial.payload.response.ApiResponse;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -104,6 +105,20 @@ public class GlobalExceptionHandler {
                         ApiResponse.builder()
                                 .status(String.valueOf(HttpStatus.UNAUTHORIZED))
                                 .message(List.of(exception.getMessage()))
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(value = BindException.class)
+    public ResponseEntity<ApiResponse<?>> BindExceptionHandler(BindException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ApiResponse.builder()
+                                .status(String.valueOf(HttpStatus.BAD_REQUEST))
+                                .message(exception.getAllErrors().stream()
+                                        .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                                        .toList())
                                 .build()
                 );
     }

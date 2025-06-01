@@ -27,6 +27,7 @@ public class ValidationServiceImpl implements ValidationService {
         List<String> errorMessages = new ArrayList<>();
         errorMessages.add(ValidationUtils.validateUsername(registerRequest.getUsername()));
         errorMessages.add(ValidationUtils.validatePassword(registerRequest.getPassword()));
+        errorMessages.add(ValidationUtils.validateEmail(registerRequest.getEmail()));
         throwError(errorMessages);
     }
 
@@ -34,7 +35,6 @@ public class ValidationServiceImpl implements ValidationService {
     public void getUserInfoUpdateError(UserInfoDto userInfoDto) {
         List<String> errorMessages = new ArrayList<>();
         errorMessages.add(ValidationUtils.validateFullName(userInfoDto.getFullName()));
-        errorMessages.add(ValidationUtils.validateEmail(userInfoDto.getEmail()));
         errorMessages.add(ValidationUtils.validatePhone(userInfoDto.getPhoneNumber()));
         errorMessages.add(ValidationUtils.validateDOB(userInfoDto.getDateOfBirth()));
         throwError(errorMessages);

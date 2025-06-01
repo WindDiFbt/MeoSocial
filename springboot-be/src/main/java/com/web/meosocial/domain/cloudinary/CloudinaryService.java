@@ -1,4 +1,4 @@
-package com.web.meosocial.cloudinary;
+package com.web.meosocial.domain.cloudinary;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
