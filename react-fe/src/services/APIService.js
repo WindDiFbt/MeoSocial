@@ -12,8 +12,12 @@ export const logout = () => {
     return axios.post(`/auth/logout`)
 }
 
-export const register = (username, password) => {
-    return axios.post(`/auth/register`, { username, password });
+export const register = (email, username, password) => {
+    return axios.post(`/auth/register`, { email, username, password });
+}
+
+export const verifyEmail = (email, code) => {
+    return axios.post(`/auth/verify`, { email, code });
 }
 
 export const getUserInfo = () => {

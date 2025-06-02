@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { login } from "../../services/APIService"
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
+import { clearEmailForVerification } from "../../redux/slices/AuthSlice";
 import { login as loginAction } from "../../redux/slices/AuthSlice";
+import { Eye, EyeClosed } from 'lucide-react';
 
 const LoginPage = () => {
     const [identifier, setIdentifier] = useState('');
@@ -12,6 +14,9 @@ const LoginPage = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [errors, setErrors] = useState([]);
+    const [showPassword, setShowPassword] = useState(false);
+    const location = useLocation();
+    const hasToastedRef = useRef(false);
 
     useEffect(() => {
         const savedIdentifier = localStorage.getItem("savedIdentifier");
@@ -21,7 +26,12 @@ const LoginPage = () => {
             setPassword(savedPassword);
             setRemember(true);
         }
-    }, []);
+        if (location.state?.fromVerify && !hasToastedRef.current) {
+            toast.success("Account verified successfully. Please log in.");
+            dispatch(clearEmailForVerification());
+            hasToastedRef.current = true;
+        }
+    }, [location, dispatch]);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -63,29 +73,54 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-100">
-            <div className="bg-white p-8 shadow-lg rounded-lg w-96">
-                <h2 className="text-2xl font-bold text-center text-gray-700">Đăng nhập</h2>
-                <form onSubmit={handleLogin} className="mt-4">
-                    <div className="mb-4">
-                        <label className="block text-gray-600">Tên đăng nhập hoặc email</label>
-                        <input
-                            type="text"
-                            className="w-full px-4 py-2 border rounded-md"
-                            value={identifier}
-                            onChange={(e) => setIdentifier(e.target.value)}
-                        />
+        <div className="flex min-h-full items-center flex-col justify-center px-6 py-12 lg:px-8">
+            <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+                <img className="mx-auto h-25 w-auto" src="/meosocial_logo.png" alt="MeoSocial" />
+                <h2 className="mt-5 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Sign in to your account</h2>
+            </div>
+
+            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+                <form className="space-y-6" onSubmit={handleLogin}>
+                    <div>
+                        <label htmlFor="identifier" className="block font-medium text-gray-900">Email / Phone number / Username</label>
+                        <div className="mt-2">
+                            <input type="text" required
+                                id="identifier"
+                                className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                value={identifier}
+                                autoComplete="username"
+                                onChange={(e) => setIdentifier(e.target.value)}
+                            />
+                        </div>
                     </div>
-                    <div className="mb-4">
-                        <label className="block text-gray-600">Mật khẩu</label>
-                        <input
-                            type="password"
-                            className="w-full px-4 py-2 border rounded-md"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
+                    <div>
+                        <div className="flex items-center justify-between">
+                            <label htmlFor="password" className="block font-medium text-gray-900">Password</label>
+                            <div className="text-sm">
+                                <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+                            </div>
+                        </div>
+                        <div className="mt-2 relative">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                id="password"
+                                required
+                                className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                value={password}
+                                autoComplete="current-password"
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                            >
+                                {showPassword ? <Eye size={20}></Eye> : <EyeClosed size={20}></EyeClosed>}
+                            </button>
+                        </div>
                     </div>
-                    <div className="mb-4">
+                    <div className="mb-4 flex justify-end">
+                        <span className="mr-2 text-gray-600 font-medium">Remember Me</span>
                         <label className="inline-flex items-center">
                             <input
                                 type="checkbox"
@@ -93,12 +128,11 @@ const LoginPage = () => {
                                 checked={remember}
                                 onChange={(e) => setRemember(e.target.checked)}
                             />
-                            <span className="ml-2 text-gray-600">Remember Me</span>
                         </label>
                     </div>
-                    <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded-md">
-                        Đăng nhập
-                    </button>
+                    <div>
+                        <button type="submit" className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Sign in</button>
+                    </div>
                 </form>
                 {errors.length > 0 && (
                     <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded text-sm">
@@ -109,21 +143,9 @@ const LoginPage = () => {
                         </ul>
                     </div>
                 )}
-                <p className="mt-4 text-center text-gray-600">
-                    Chưa có tài khoản?{" "}
-                    <Link to="/register" className="text-green-500 hover:underline">
-                        Đăng ký
-                    </Link>
-                </p>
-                <p className="mt-2 text-center text-gray-600 text-sm">
-                    <Link to="/" className="text-blue-500 hover:underline">
-                        Quên mật khẩu?
-                    </Link>
-                </p>
-                <p className="mt-2 text-center text-gray-600">
-                    <Link to="/" className="text-blue-500 hover:underline">
-                        Trang chủ
-                    </Link>
+                <p className="mt-5 text-center text-gray-500">
+                    Not a member?
+                    <Link to="/register" className="ml-1 font-semibold text-indigo-600 hover:text-indigo-500">Sign up</Link>
                 </p>
             </div>
         </div>

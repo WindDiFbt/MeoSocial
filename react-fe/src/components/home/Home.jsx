@@ -12,7 +12,7 @@ import {
 
 export default function Home() {
     const dispatch = useDispatch();
-    const { homePosts, isLoading } = useSelector((state) => state.posts);
+    const { homePosts } = useSelector((state) => state.posts);
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -30,10 +30,6 @@ export default function Home() {
         };
         fetchPosts();
     }, [dispatch]);
-
-    if (isLoading) {
-        return <p className="text-center">Loading posts...</p>;
-    }
 
     return (
         <div>
@@ -111,13 +107,13 @@ export default function Home() {
 const getVisibilityLabel = (level) => {
     switch (level) {
         case 1:
-            return { label: "Public", icon: <Globe className="h-4 w-4" /> };
+            return { label: "Public", icon: <Globe size={17} /> };
         case 2:
-            return { label: "Followers", icon: <Footprints className="h-4 w-4" /> };
+            return { label: "Followers", icon: <Footprints size={17} /> };
         case 3:
-            return { label: "Friends", icon: <UserRound className="h-4 w-4" /> };
+            return { label: "Friends", icon: <UserRound size={17} /> };
         case 4:
-            return { label: "Private", icon: <Lock className="h-4 w-4" /> };
+            return { label: "Private", icon: <Lock size={17} /> };
         default:
             return { label: "Unknown", icon: null };
     }
