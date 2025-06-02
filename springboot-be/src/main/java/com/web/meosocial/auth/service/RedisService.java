@@ -13,7 +13,13 @@ public interface RedisService {
 
     void removeCachedVerifyCode(String email);
 
-    void cachePendingRegister(RegisterRequest registerRequest);
+    void cachePendingRegistration(RegisterRequest registerRequest);
 
-    RegisterRequest getPendingRegister(String email);
+    RegisterRequest getAndRemovePendingRegistration(String email);
+
+    boolean isPendingRegistrationExist(String email);
+
+    void setResendCooldown(String email, long cooldownTimeInSeconds);
+
+    boolean isResendCooldownActive(String email);
 }

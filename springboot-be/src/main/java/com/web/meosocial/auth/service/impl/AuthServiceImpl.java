@@ -101,16 +101,15 @@ public class AuthServiceImpl implements AuthService {
         if (registerRequest.getEmail() == null || userService.existsByEmail(registerRequest.getEmail())) {
             throw new UserAlreadyExistsException("Email already exists!");
         }
-
-        redisService.cachePendingRegister(registerRequest);
-        verificationService.sendVerificationCode(registerRequest.getEmail());
+        redisService.cachePendingRegistration(registerRequest);
+        verificationService.sendVerificationEmailCode(registerRequest.getEmail());
         return ResponseEntity.status(HttpStatus.OK).body(
                 apiResponseUtils.success(null, "Please check your email for verification.")
         );
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> verify(String email, String code) throws RoleNotFoundException {
+    public ResponseEntity<ApiResponse<?>> verifyEmail(String email, String code) throws RoleNotFoundException {
         if (email == null || code == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     apiResponseUtils.error(HttpStatus.BAD_REQUEST, "Email and verification code must not be null!")
@@ -121,7 +120,7 @@ public class AuthServiceImpl implements AuthService {
                     apiResponseUtils.error(HttpStatus.BAD_REQUEST, "Invalid verification code!")
             );
         }
-        RegisterRequest registerRequest = redisService.getPendingRegister(email);
+        RegisterRequest registerRequest = redisService.getAndRemovePendingRegistration(email);
         if (registerRequest == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     apiResponseUtils.error(HttpStatus.BAD_REQUEST, "No pending registration found for this email!")
@@ -208,5 +207,28 @@ public class AuthServiceImpl implements AuthService {
                                 .refreshToken(refreshToken)
                                 .accessToken(newAccessToken).build(), "Successfully refreshed token!")
         );
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<?>> resendEmailVerificationCode(String email) {
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    apiResponseUtils.error(HttpStatus.BAD_REQUEST, "Email must not be null!")
+            );
+        }
+        if (!redisService.isPendingRegistrationExist(email)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    apiResponseUtils.error(HttpStatus.NOT_FOUND, "No pending registration found for this email!")
+            );
+        }
+        try {
+            verificationService.resendVerificationEmailCode(email);
+            return ResponseEntity.ok().body(
+                    apiResponseUtils.success(null, "Verification code re-sent successfully!"));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(
+                    apiResponseUtils.error(HttpStatus.TOO_MANY_REQUESTS, e.getMessage())
+            );
+        }
     }
 }

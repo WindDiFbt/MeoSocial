@@ -7,6 +7,5 @@ import lombok.Data;
 public class VerifyRequest {
     @NotBlank(message = "Email is required!")
     private String email;
-    @NotBlank(message = "Code is required!")
     private String code;
 }
