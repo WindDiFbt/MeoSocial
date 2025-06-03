@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { verifyEmail } from "../../services/APIService";
+import { verifyEmail, resendVerifyCode } from "../../services/APIService";
 import { useSelector } from "react-redux";
 
 const VerifyPage = () => {
@@ -10,6 +10,7 @@ const VerifyPage = () => {
 
     const [code, setCode] = useState('');
     const [errors, setErrors] = useState([]);
+    const [countdown, setCountdown] = useState(120);
     const hasToastedRef = useRef(false);
 
     useEffect(() => {
@@ -18,8 +19,20 @@ const VerifyPage = () => {
             navigate('/register');
             hasToastedRef.current = true;
         }
-    }, [email, navigate]);
+        let timer;
+        if (countdown > 0) {
+            timer = setInterval(() => {
+                setCountdown((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(timer);
+    }, [email, navigate, countdown]);
 
+    const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}:${remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds}`;
+    }
 
     const handleVerify = async (e) => {
         e.preventDefault();
@@ -44,6 +57,22 @@ const VerifyPage = () => {
             } else {
                 setErrors(["An unexpected error occurred."]);
             }
+        }
+    };
+
+    const handleResendeVerifyCode = async (e) => {
+        e.preventDefault();
+        setErrors([]);
+        if (!email) {
+            setErrors(["No email provided for verification."]);
+            return;
+        }
+        try {
+            const response = await resendVerifyCode(email.trim());
+            toast.success("Verification code resent!");
+            setCountdown(120);
+        } catch (error) {
+            setErrors(["Failed to resend verification code. Please try again later."]);
         }
     };
 
@@ -85,9 +114,19 @@ const VerifyPage = () => {
 
                 <p className="mt-4 text-center text-gray-600 text-sm">
                     Didn't receive code?
-                    <a href="#" className="ml-1 text-indigo-600 font-semibold hover:underline">
-                        Resend
-                    </a>
+                    {countdown > 0 ? (
+                        <span className="ml-1 text-gray-500">
+                            Resend available in {formatTime(countdown)}
+                        </span>
+                    ) : (
+                        <a
+                            href="#"
+                            onClick={handleResendeVerifyCode}
+                            className="ml-1 text-indigo-600 font-semibold hover:underline"
+                        >
+                            Resend
+                        </a>
+                    )}
                 </p>
             </div>
         </div>
