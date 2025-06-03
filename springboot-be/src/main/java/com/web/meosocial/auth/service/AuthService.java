@@ -18,5 +18,7 @@ public interface AuthService {
 
     ResponseEntity<ApiResponse<?>> refreshAccessToken(String refreshToken);
 
-    ResponseEntity<ApiResponse<?>> verify(String email, String code) throws RoleNotFoundException;
+    ResponseEntity<ApiResponse<?>> verifyEmail(String email, String code) throws RoleNotFoundException;
+
+    ResponseEntity<ApiResponse<?>> resendEmailVerificationCode(String email);
 }

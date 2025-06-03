@@ -1,5 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const updatePostInList = (list, postId, updater) => {
+    return list.map((post) =>
+        post.id === postId ? updater(post) : post
+    );
+};
+
 const initialState = {
     homePosts: [],
     profilePosts: [],
@@ -35,6 +41,16 @@ const postSlice = createSlice({
         addPost: (state, action) => {
             state.posts.push(action.payload);
         },
+        updatePostLike(state, action) {
+            const { postId, isLiked } = action.payload;
+            const applyUpdate = (post) => ({
+                ...post,
+                isLiked,
+                postLikeCount: post.postLikeCount + (isLiked ? 1 : -1),
+            });
+            state.homePosts = updatePostInList(state.homePosts, postId, applyUpdate);
+            state.profilePosts = updatePostInList(state.profilePosts, postId, applyUpdate);
+        },
     },
 });
 
@@ -46,5 +62,6 @@ export const {
     fetchPostsFailure,
     setPosts,
     addPost,
+    updatePostLike,
 } = postSlice.actions;
 export default postSlice.reducer;

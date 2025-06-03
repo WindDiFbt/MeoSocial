@@ -7,4 +7,8 @@ public interface LikeService {
     ApiResponse<LikePostDto> likePost(Long userId, String postId);
 
     ApiResponse<LikePostDto> unlikePost(Long userId, String postId);
+
+    Integer countLikesByPostId(String postId);
+
+    Boolean isPostLikedByUser(String postId, Long userId);
 }

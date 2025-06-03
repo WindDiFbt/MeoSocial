@@ -8,6 +8,7 @@ import com.web.meosocial.domain.post.dto.PostDto;
 import com.web.meosocial.domain.post.dto.SharedPostDto;
 import com.web.meosocial.domain.post.model.Post;
 import com.web.meosocial.domain.post.repository.PostRepository;
+import com.web.meosocial.domain.post.service.LikeService;
 import com.web.meosocial.domain.post.service.PostMediaService;
 import com.web.meosocial.domain.post.service.PostService;
 import com.web.meosocial.domain.user.model.User;
@@ -41,6 +42,8 @@ public class PostServiceImpl implements PostService {
     private ApiResponseUtils apiResponseUtils;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private LikeService likeService;
 
     /**
      * Creates a new post.
@@ -58,7 +61,7 @@ public class PostServiceImpl implements PostService {
         post.setUser(user);
         post.setIsSharedPost(false);
         post = savePostInformation(post, postDto.getContent(), postDto.getVisibilityLevel());
-        return apiResponseUtils.success(new PostDto(post), "Post created successfully!");
+        return apiResponseUtils.success(new PostDto(post, null, null, null), "Post created successfully!");
     }
 
     /**
@@ -91,7 +94,13 @@ public class PostServiceImpl implements PostService {
             post.setPostmedia(post.getPostmedia().stream()
                     .filter(pm -> !pm.getIsDelete()).collect(Collectors.toList()));
         }
-        return apiResponseUtils.success(posts.stream().map(PostDto::new).collect(Collectors.toList()), "All posts found!");
+        List<PostDto> postDtos = posts.stream().map(post -> {
+            Integer likeCount = likeService.countLikesByPostId(post.getId());
+            Integer commentCount = commentService.countCommentOfPost(post.getId());
+            Boolean isLiked = likeService.isPostLikedByUser(post.getId(), userId);
+            return new PostDto(post, likeCount, commentCount, isLiked);
+        }).toList();
+        return apiResponseUtils.success(postDtos, "All Posts found!");
     }
 
     /**
@@ -128,11 +137,16 @@ public class PostServiceImpl implements PostService {
      * @return ApiResponseDto&lt;PostDto&gt; containing the requested post.
      */
     @Override
-    public ApiResponse<PostDto> getPost(String postId) {
+    public ApiResponse<PostDto> getPost(Long UserId, String postId) {
         Post post = getPostById(postId);
         post.setPostmedia(post.getPostmedia().stream()
                 .filter(pm -> !pm.getIsDelete()).collect(Collectors.toList()));
-        return apiResponseUtils.success(new PostDto(post), "Post found!");
+        return apiResponseUtils.success(
+                new PostDto(post,
+                        likeService.countLikesByPostId(postId),
+                        commentService.countCommentOfPost(postId),
+                        likeService.isPostLikedByUser(postId, UserId)
+                ), "Post found!");
     }
 
     /**
@@ -174,7 +188,7 @@ public class PostServiceImpl implements PostService {
             postRepository.saveAll(sharedPosts);
         }
         postRepository.save(post);
-        return apiResponseUtils.success(new PostDto(post), "Post's visibility changed successfully!");
+        return apiResponseUtils.success(null, "Post's visibility changed successfully!");
     }
 
     /**
@@ -196,7 +210,12 @@ public class PostServiceImpl implements PostService {
         post.setContent(postDto.getContent());
         post.setUpdatedAt(LocalDateTime.now());
         postRepository.save(post);
-        return apiResponseUtils.success(new PostDto(post), "Post updated successfully!");
+        return apiResponseUtils.success(
+                new PostDto(post,
+                        likeService.countLikesByPostId(postId),
+                        commentService.countCommentOfPost(postId),
+                        likeService.isPostLikedByUser(postId, userId)
+                ), "Post updated successfully!");
     }
 
     @Override
@@ -265,6 +284,6 @@ public class PostServiceImpl implements PostService {
                 Enums.NotificationType.SHARE_POST.getValue(),
                 "User " + user.getUserName() + " shared your post!"
         );
-        return new PostDto(newPost);
+        return new PostDto(newPost, null, null, null);
     }
 }

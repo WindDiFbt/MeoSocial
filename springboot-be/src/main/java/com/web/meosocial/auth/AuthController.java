@@ -38,7 +38,12 @@ public class AuthController {
     @PostMapping("/verify")
     public ResponseEntity<ApiResponse<?>> verify(@RequestBody @Valid VerifyRequest verifyRequest)
             throws RoleNotFoundException {
-        return authService.verify(verifyRequest.getEmail(), verifyRequest.getCode());
+        return authService.verifyEmail(verifyRequest.getEmail(), verifyRequest.getCode());
+    }
+
+    @PostMapping("/resend-verification")
+    public ResponseEntity<ApiResponse<?>> resendVerificationCode(@RequestBody @Valid VerifyRequest verifyRequest) {
+        return authService.resendEmailVerificationCode(verifyRequest.getEmail());
     }
 
     @PostMapping("/logout")

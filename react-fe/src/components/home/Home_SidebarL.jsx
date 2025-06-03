@@ -65,20 +65,20 @@ export default function Home_SidebarL() {
       <aside className="flex h-full w-64 flex-col justify-between border-r border-gray-200 p-4 fixed pt-20">
         <div>
           <div className="space-y-1 pt-2">
-            <SidebarItem icon={<Home className="h-4 w-4" />} label="Home" to="/home" />
-            <SidebarItem icon={<Calendar className="h-4 w-4" />} label="Events" to="#" />
-            <SidebarItem icon={<Ticket className="h-4 w-4" />} label="Orders" to="#" />
-            <SidebarItem icon={<Megaphone className="h-4 w-4" />} label="Broadcasts" to="#" />
+            <SidebarItem icon={<Home size={18} />} label="Home" to="/home" />
+            <SidebarItem icon={<Calendar size={18} />} label="Events" to="#" />
+            <SidebarItem icon={<Ticket size={18} />} label="Orders" to="#" />
+            <SidebarItem icon={<Megaphone size={18} />} label="Broadcasts" to="#" />
             <hr className="border-gray-200 my-4" />
             <SidebarItem
-              icon={<BadgePlus className="h-4 w-4" />}
+              icon={<BadgePlus size={18} />}
               label="New Post"
               onClick={openModal}
             />
-            <SidebarItem icon={<Video className="h-4 w-4" />} label="Livestream" to="#"/>
+            <SidebarItem icon={<Video size={18} />} label="Livestream" to="#" />
             <hr className="border-gray-200 my-4" />
-            <SidebarItem icon={<HelpCircle className="h-4 w-4" />} label="Support" to="#"/>
-            <SidebarItem icon={<Sparkles className="h-4 w-4" />} label="Changelog" to="#"/>
+            <SidebarItem icon={<HelpCircle size={18} />} label="Support" to="#" />
+            <SidebarItem icon={<Sparkles size={18} />} label="Changelog" to="#" />
           </div>
         </div>
 
@@ -89,9 +89,9 @@ export default function Home_SidebarL() {
               ${open ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}
             >
               <div className="flex flex-col rounded border border-gray-200 shadow">
-                <DropdownItem icon={<User className="h-4 w-4" />} label="Profile" onClick={handleProfileClick} />
-                <DropdownItem icon={<Settings className="h-4 w-4" />} label="Settings" />
-                <DropdownItem icon={<LogOut className="h-4 w-4" />} label="Logout" onClick={handleLogout} />
+                <DropdownItem icon={<User size={18} />} label="Profile" onClick={handleProfileClick} />
+                <DropdownItem icon={<Settings size={18} />} label="Settings" />
+                <DropdownItem icon={<LogOut size={18} />} label="Logout" onClick={handleLogout} />
               </div>
             </div>
 
@@ -111,9 +111,9 @@ export default function Home_SidebarL() {
                 </div>
               </div>
               {open ? (
-                <ChevronDown className="h-4 w-4 text-gray-500" />
+                <ChevronDown className="text-gray-500" size={18} />
               ) : (
-                <ChevronUp className="h-4 w-4 text-gray-500" />
+                <ChevronUp className="text-gray-500" size={18} />
               )}
             </div>
           </div>

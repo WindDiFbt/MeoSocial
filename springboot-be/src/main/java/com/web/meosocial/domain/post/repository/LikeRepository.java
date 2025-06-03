@@ -10,4 +10,9 @@ import org.springframework.stereotype.Repository;
 public interface LikeRepository extends JpaRepository<Like, String> {
     @Query("SELECT l FROM Like l WHERE l.post.id = :postId AND l.user.id = :userId")
     Like findByPostIdAndUserId(@Param("postId") String postId, @Param("userId") Long userId);
+
+    @Query("SELECT COUNT(l) FROM Like l WHERE l.post.id = :postId AND l.isDeleted = false")
+    Integer countByPostIdAndIsDeletedFalse(String postId);
+
+    Boolean existsByUserIdAndPostIdAndIsDeletedFalse(Long userId, String postId);
 }

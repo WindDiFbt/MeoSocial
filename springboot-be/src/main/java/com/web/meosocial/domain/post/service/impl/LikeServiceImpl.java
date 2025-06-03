@@ -6,8 +6,8 @@ import com.web.meosocial.domain.post.dto.LikePostDto;
 import com.web.meosocial.domain.post.model.Like;
 import com.web.meosocial.domain.post.model.Post;
 import com.web.meosocial.domain.post.repository.LikeRepository;
+import com.web.meosocial.domain.post.repository.PostRepository;
 import com.web.meosocial.domain.post.service.LikeService;
-import com.web.meosocial.domain.post.service.PostService;
 import com.web.meosocial.domain.user.model.User;
 import com.web.meosocial.domain.user.service.UserService;
 import com.web.meosocial.domain.validator.service.ValidationService;
@@ -25,7 +25,7 @@ public class LikeServiceImpl implements LikeService {
     @Autowired
     private LikeRepository likeRepository;
     @Autowired
-    private PostService postService;
+    private PostRepository postRepository;
     @Autowired
     private UserService userService;
     @Autowired
@@ -46,15 +46,9 @@ public class LikeServiceImpl implements LikeService {
     @Transactional
     @Override
     public ApiResponse<LikePostDto> likePost(Long userId, String postId) {
-        Post post = postService.getPostById(postId);
+        Post post = postRepository.findById(postId).orElse(null);
         User user = userService.getUserById(userId);
-        if (validationService.hasNotPermissionToAction(user, post, Enums.VisibilityLevel.fromValue(post.getVisibilityLevel()))) {
-            throw new IllegalArgumentException("You do not have permission to comment on this post!");
-        }
-        if (post.getIsDelete()) {
-            throw new IllegalArgumentException("Post is deleted!");
-        }
-        Like liked = likeRepository.findByPostIdAndUserId(postId, userId);
+        Like liked = getLikeByUserAndPost(user, post);
         if (liked != null) {
             if (liked.getIsDeleted()) {
                 liked.setIsDeleted(false);
@@ -91,20 +85,45 @@ public class LikeServiceImpl implements LikeService {
     @Transactional
     @Override
     public ApiResponse<LikePostDto> unlikePost(Long userId, String postId) {
-        Post post = postService.getPostById(postId);
+        Post post = postRepository.findById(postId).orElse(null);
         User user = userService.getUserById(userId);
-        if (validationService.hasNotPermissionToAction(user, post, Enums.VisibilityLevel.fromValue(post.getVisibilityLevel()))) {
-            throw new IllegalArgumentException("You do not have permission to comment on this post!");
-        }
-        if (post.getIsDelete()) {
-            throw new IllegalArgumentException("Post is deleted!");
-        }
-        Like liked = likeRepository.findByPostIdAndUserId(postId, userId);
+        Like liked = getLikeByUserAndPost(user, post);
         if (liked == null || liked.getIsDeleted()) {
             throw new IllegalArgumentException("User already liked this post!");
         }
         liked.setIsDeleted(true);
         likeRepository.save(liked);
         return apiResponseUtils.success(new LikePostDto(liked), "Unlike Successfully!");
+    }
+
+    /**
+     * Counts the number of likes for a specific post.
+     * Currently, this method returns 0 as a placeholder.
+     *
+     * @param postId the ID of the post for which to count likes
+     * @return the number of likes for the specified post
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Integer countLikesByPostId(String postId) {
+        return likeRepository.countByPostIdAndIsDeletedFalse(postId);
+    }
+
+    @Override
+    public Boolean isPostLikedByUser(String postId, Long userId) {
+        return likeRepository.existsByUserIdAndPostIdAndIsDeletedFalse(userId, postId);
+    }
+
+    private Like getLikeByUserAndPost(User user, Post post) {
+        if (post == null || post.getIsDelete()) {
+            throw new IllegalArgumentException("Post Not Found or deleted.");
+        }
+        if (validationService.hasNotPermissionToAction(user, post, Enums.VisibilityLevel.fromValue(post.getVisibilityLevel()))) {
+            throw new IllegalArgumentException("You do not have permission to comment on this post!");
+        }
+        if (post.getIsDelete()) {
+            throw new IllegalArgumentException("Post is deleted!");
+        }
+        return likeRepository.findByPostIdAndUserId(post.getId(), user.getId());
     }
 }

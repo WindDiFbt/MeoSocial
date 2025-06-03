@@ -23,4 +23,6 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
     @Query("SELECT COUNT(c) > 0 FROM Comment c  WHERE c.id = :commentId AND c.post.id = :postId")
     boolean existsByCommentIdAndPostId(@Param("commentId") String commentId, @Param("postId") String postId);
 
+    @Query("SELECT COUNT(c) FROM Comment c WHERE c.post.id = :postId AND c.isDelete = false")
+    Integer countByPostIdAndIsDeletedFalse(String postId);
 }

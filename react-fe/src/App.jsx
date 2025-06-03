@@ -4,6 +4,7 @@ import LandingPage from "./components/home/LandingPage";
 import LoginPage from "./components/auth/Login";
 import HomePage from "./components/home/Home";
 import RegisterPage from "./components/auth/Register";
+import VerifyPage from "./components/auth/Verify";
 import Profile from "./components/profile/Profile";
 import Posts from "./components/profile/Posts";
 import Media from "./components/profile/Media";
@@ -17,6 +18,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/verify" element={<VerifyPage />} />
         <Route path="/profile" element={<Profile />}>
           <Route index element={<Navigate to="posts" replace />} />
           <Route path="posts" element={<Posts />} />

@@ -38,7 +38,6 @@ export default function Profile() {
                 <Header />
                 <Home_SidebarL />
                 <div className="pt-22 max-w-2xl mx-auto">
-                    {/* Profile */}
                     <div className="flex items-center space-x-8 mb-8">
                         <img
                             src={user?.avatarUrl || "../../../default-avatar.jpg"}
@@ -62,7 +61,6 @@ export default function Profile() {
                         </div>
                     </div>
 
-                    {/* Tabs */}
                     <div className="flex justify-center space-x-4 mb-6 border-b border-gray-300 pb-2">
                         <Link
                             to="/profile/posts"
@@ -92,8 +90,6 @@ export default function Profile() {
                             Friends
                         </Link>
                     </div>
-
-                    {/* Nested Routes Content */}
                     <Outlet />
                 </div>
             </div>

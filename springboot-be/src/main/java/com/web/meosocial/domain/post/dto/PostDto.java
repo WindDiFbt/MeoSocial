@@ -27,11 +27,14 @@ public class PostDto {
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
     private String postOwnerAvatarUrl;
+    private Integer postLikeCount;
+    private Integer postCommentCount;
+    private Boolean isLiked;
 
     private List<PostMediaDto> media;
 
     // Constructor to map from Post entity to PostDto
-    public PostDto(Post post) {
+    public PostDto(Post post, Integer postLikeCount, Integer postCommentCount, Boolean isLiked) {
         if (post != null) {
             this.id = post.getId();
             this.userId = String.valueOf(post.getUser().getId());
@@ -46,6 +49,9 @@ public class PostDto {
             this.createdAt = post.getCreatedAt();
             this.updatedAt = post.getUpdatedAt();
             this.deletedAt = post.getDeletedAt();
+            this.postLikeCount = postLikeCount != null ? postLikeCount : 0;
+            this.postCommentCount = postCommentCount != null ? postCommentCount : 0;
+            this.isLiked = isLiked != null ? isLiked : false;
             if (post.getPostmedia() != null) {
                 this.media = post.getPostmedia().stream().map(PostMediaDto::new).collect(Collectors.toList());
             }
