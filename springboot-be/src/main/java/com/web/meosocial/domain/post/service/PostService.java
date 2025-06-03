@@ -17,7 +17,7 @@ public interface PostService {
 
     ApiResponse<Void> deletePost(Long userId, String postId);
 
-    ApiResponse<PostDto> getPost(String postId);
+    ApiResponse<PostDto> getPost(Long UserId, String postId);
 
     ApiResponse<PostDto> changeVisibilityLevel(Long userId, ChangeVisibilityDto changeVisibilityDto);
 

@@ -21,4 +21,6 @@ public interface CommentService {
     ApiResponse<CommentDto> getComment(String commentId);
 
     ApiResponse<CommentDto> updateComment(Long userId, String commentId, CommentDto commentDto);
+
+    Integer countCommentOfPost(String postId);
 }

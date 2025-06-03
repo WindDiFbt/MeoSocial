@@ -1,11 +1,10 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProfilePostsStart, fetchProfilePostsSuccess, fetchPostsFailure } from "../../redux/slices/PostSlice";
-import { getPost } from "../../services/APIService";
-import { Heart, MessageCircle, Share } from "lucide-react";
+import { fetchProfilePostsStart, fetchProfilePostsSuccess, fetchPostsFailure, updatePostLike } from "../../redux/slices/PostSlice";
+import { getPost, likePost, unlikePost } from "../../services/APIService";
 import formatDate from "../../utils/DateUtil";
 import {
-    Globe, Footprints, UserRound, Lock,
+    Globe, Footprints, UserRound, Lock, Heart, MessageCircle, Share
 } from 'lucide-react';
 
 export default function Posts() {
@@ -26,6 +25,21 @@ export default function Posts() {
         };
         fetchPosts();
     }, [dispatch]);
+
+    const handleLikeToggle = async (postId, isLiked) => {
+        try {
+            if (isLiked) {
+                await unlikePost(postId);
+                dispatch(updatePostLike({ postId, isLiked: false }));
+            } else {
+                await likePost(postId);
+                dispatch(updatePostLike({ postId, isLiked: true }));
+            }
+        } catch (error) {
+            console.error("Error toggling like:", error);
+            toast.error("Failed to update like status. Please try again.");
+        }
+    };
 
     const getVisibilityLabel = (level) => {
         switch (level) {
@@ -87,16 +101,28 @@ export default function Posts() {
                                 ))}
                             </div>
                         )}
+                        <div className="text-sm mt-2 font-medium flex justify-between">
+                            <p>{post.postLikeCount} Likes</p>
+                            <p>{post.postCommentCount} Comments</p>
+                        </div>
                         <div className="flex justify-between items-center mt-4 text-gray-600">
-                            <button className="flex items-center space-x-1 hover:text-red-500">
-                                <Heart size={20} />
+                            <button
+                                className={`flex cursor-pointer items-center space-x-1 ${post.isLiked ? "text-red-500" : "hover:text-red-500"
+                                    }`}
+                                onClick={() => handleLikeToggle(post.id, post.isLiked)}
+                            >
+                                {post.isLiked ? (
+                                    <Heart fill="red" size={20} />
+                                ) : (
+                                    <Heart size={20} />
+                                )}
                                 <span className="text-sm">Like</span>
                             </button>
-                            <button className="flex items-center space-x-1 hover:text-blue-500">
+                            <button className="flex cursor-pointer items-center space-x-1 hover:text-blue-500">
                                 <MessageCircle size={20} />
                                 <span className="text-sm">Comments</span>
                             </button>
-                            <button className="flex items-center space-x-1 hover:text-green-500">
+                            <button className="flex cursor-pointer items-center space-x-1 hover:text-green-500">
                                 <Share size={20} />
                                 <span className="text-sm">Share</span>
                             </button>

@@ -1,13 +1,12 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchHomePostsStart, fetchHomePostsSuccess, fetchPostsFailure } from "../../redux/slices/PostSlice";
+import { fetchHomePostsStart, fetchHomePostsSuccess, fetchPostsFailure, updatePostLike } from "../../redux/slices/PostSlice";
 import Header from "../shared/Header";
 import Home_SidebarL from "./Home_SidebarL";
-import { Heart, MessageCircle, Share } from "lucide-react";
-import { getPost } from "../../services/APIService";
+import { getPost, likePost, unlikePost } from "../../services/APIService";
 import formatDate from "../../utils/DateUtil";
 import {
-    Globe, Footprints, UserRound, Lock,
+    Globe, Footprints, UserRound, Lock, Heart, MessageCircle, Share
 } from 'lucide-react';
 
 export default function Home() {
@@ -30,6 +29,36 @@ export default function Home() {
         };
         fetchPosts();
     }, [dispatch]);
+
+    const handleLikeToggle = async (postId, isLiked) => {
+        try {
+            if (isLiked) {
+                await unlikePost(postId);
+                dispatch(updatePostLike({ postId, isLiked: false }));
+            } else {
+                await likePost(postId);
+                dispatch(updatePostLike({ postId, isLiked: true }));
+            }
+        } catch (error) {
+            console.error("Error toggling like:", error);
+            toast.error("Failed to update like status. Please try again.");
+        }
+    };
+
+    const getVisibilityLabel = (level) => {
+        switch (level) {
+            case 1:
+                return { label: "Public", icon: <Globe size={17} /> };
+            case 2:
+                return { label: "Followers", icon: <Footprints size={17} /> };
+            case 3:
+                return { label: "Friends", icon: <UserRound size={17} /> };
+            case 4:
+                return { label: "Private", icon: <Lock size={17} /> };
+            default:
+                return { label: "Unknown", icon: null };
+        }
+    };
 
     return (
         <div>
@@ -80,17 +109,28 @@ export default function Home() {
                                         ))}
                                     </div>
                                 )}
-
+                                <div className="text-sm mt-2 font-medium flex justify-between">
+                                    <p>{post.postLikeCount} Likes</p>
+                                    <p>{post.postCommentCount} Comments</p>
+                                </div>
                                 <div className="flex justify-between items-center mt-4 text-gray-600">
-                                    <button className="flex items-center space-x-1 hover:text-red-500">
-                                        <Heart size={20} />
+                                    <button
+                                        className={`flex cursor-pointer items-center space-x-1 ${post.isLiked ? "text-red-500" : "hover:text-red-500"
+                                            }`}
+                                        onClick={() => handleLikeToggle(post.id, post.isLiked)}
+                                    >
+                                        {post.isLiked ? (
+                                            <Heart fill="red" size={20} />
+                                        ) : (
+                                            <Heart size={20} />
+                                        )}
                                         <span className="text-sm">Like</span>
                                     </button>
-                                    <button className="flex items-center space-x-1 hover:text-blue-500">
+                                    <button className="flex cursor-pointer items-center space-x-1 hover:text-blue-500">
                                         <MessageCircle size={20} />
                                         <span className="text-sm">Comments</span>
                                     </button>
-                                    <button className="flex items-center space-x-1 hover:text-green-500">
+                                    <button className="flex cursor-pointer items-center space-x-1 hover:text-green-500">
                                         <Share size={20} />
                                         <span className="text-sm">Share</span>
                                     </button>
@@ -103,18 +143,3 @@ export default function Home() {
         </div>
     );
 }
-
-const getVisibilityLabel = (level) => {
-    switch (level) {
-        case 1:
-            return { label: "Public", icon: <Globe size={17} /> };
-        case 2:
-            return { label: "Followers", icon: <Footprints size={17} /> };
-        case 3:
-            return { label: "Friends", icon: <UserRound size={17} /> };
-        case 4:
-            return { label: "Private", icon: <Lock size={17} /> };
-        default:
-            return { label: "Unknown", icon: null };
-    }
-};

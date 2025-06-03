@@ -38,7 +38,7 @@ public class RestPostController {
 
     @GetMapping("/{postId}")
     public ResponseEntity<?> getPostById(@PathVariable String postId) {
-        return ResponseEntity.ok().body(postService.getPost(postId));
+        return ResponseEntity.ok().body(postService.getPost(authUtils.getCurrentUserId(), postId));
     }
 
     @PatchMapping("/update/{postId}")

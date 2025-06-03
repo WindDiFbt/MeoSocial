@@ -208,6 +208,11 @@ public class CommentServiceImpl implements CommentService {
         return apiResponseUtils.success(new CommentDto(comment), "Update comment successfully!");
     }
 
+    @Override
+    public Integer countCommentOfPost(String postId) {
+        return commentRepository.countByPostIdAndIsDeletedFalse(postId);
+    }
+
     private Comment getCommentById(String commentId) {
         Comment comment = commentRepository.findById(commentId).orElse(null);
         if (comment == null || comment.getIsDelete()) {
